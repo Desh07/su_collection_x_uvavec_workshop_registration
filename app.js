@@ -266,7 +266,7 @@ const QUIZ_QUESTIONS = [
       'ඔබේ අරමුණ හෝ ඔබ මුහුණ දෙන අභියෝගය ගැන අපි දැනගත යුතු තවත් දෙයක් තියෙනවාද?',
       'Anything else about your goal or challenge you\'d like us to know?'
     ),
-    placeholder: 'ලිවිය හැකි නම් ලියන්න... / Optional — share anything you\'d like us to know',
+    placeholder: 'ලිවිය හැකි නම් ලියන්න... / Anything else? - optional',
     optional: true,
   },
 ];
@@ -441,7 +441,7 @@ window.Funnel = {
         html += `
           <button class="quiz-choice ${isSel ? 'selected' : ''}"
             onclick="window.Funnel.toggleMulti('${c.value}', '${currentQ.field}')">
-            <span class="quiz-choice-key multi-check">${isSel ? '✓' : c.key}</span>
+            <span class="quiz-choice-key multi-check">${c.key}</span>
             <span class="quiz-choice-label">${c.label}</span>
           </button>
         `;
@@ -449,7 +449,7 @@ window.Funnel = {
       html += `</div>
         <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
           ${state.multiVals.length === 0 ? 'disabled' : ''}>
-          OK ✓
+          OK
         </button>
       </div>`;
       contentArea.innerHTML = html;
@@ -470,8 +470,8 @@ window.Funnel = {
             value="${existing}"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)">
           <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-            <button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip ➔</button>
-            <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}">ඉදිරියට / Next ➔</button>
+            <button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>
+            <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}">ඉදිරියට / Next</button>
           </div>
         </div>
       `;
@@ -586,15 +586,13 @@ window.Funnel = {
     if (secureBadge) secureBadge.style.display = 'none';
 
     const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
-    const shareMessage = "ඔබටත් සාර්ථක ව්‍යාපාරයක් ගොඩනගන්න අවශ්‍යද? එහෙමත් නැත්නම් tailoring field එකෙන් ඉස්සරහට යන්න කැමතිද? ව්‍යාපාරික දැනුම වගේම අලුත්ම technical skills ඉගෙනගන්න, Su Collection සහ UVA VEC එකතුවෙලා කරන මේ නොමිලේ workshop එකට ඔයාත් සම්බන්ධ වෙන්න!\n\nලියාපදිංචි වීමට: https://su-collection.web.app";
+    const shareMessage = "ඔබටත් සාර්ථක ව්‍යාපාරයක් ගොඩනගන්න අවශ්‍යද? එහෙමත් නැත්නම් tailoring field එකෙන් ඉස්සරහට යන්න කැමතිද? ව්‍යාපාරික දැනුම වගේම අලුත්ම technical skills ඉගෙනගන්න, Su Collection සහ UVA VEC එකතුවෙලා කරන මේ නොමිලේ workshop එකට ඔයාත් සම්බන්ධ වෙන්න!\n\nලියාපදිංචි වීමට: https://su-collection-x-uvavec.vercel.app/";
     const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
 
     contentArea.innerHTML = `
       <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <div class="quiz-result-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          </div>
+
           <h2 style="line-height: 1.4; font-size: clamp(1.2rem, 4vw, 1.5rem);">නියමයි, ${firstName}!<br><em style="font-size:clamp(0.9rem, 3vw, 1.1rem); font-style:normal; font-weight:400; color:var(--md-sys-color-primary);">Registration Successful</em></h2>
           <p class="quiz-result-message" style="margin-top: 0.5rem; margin-bottom: 0.5rem; line-height: 1.6; font-size: clamp(0.9rem, 3vw, 1rem);">
             ඔබේ තොරතුරු අපට ලැබුණා. අපි ඔබේ පිළිතුරු analyze කරලා තියෙන්නේ. ඔබේ personalised growth path එක ඔස්සේ ඊළඟ පියවර ගැන දැනුවත් කරන්න අපේ team එක ඉතා ඉක්මනින් ඔබව සම්බන්ධ කරගන්නවා ඇත.<br><br>
