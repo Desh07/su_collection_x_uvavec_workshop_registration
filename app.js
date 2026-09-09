@@ -33,11 +33,11 @@ const QUIZ_QUESTIONS = [
     ]
   },
   {
-    id: 'REG-06', field: 'primaryGoal', type: 'single-choice', phase: 'step2',
+    id: 'REG-06', field: 'primaryGoal', type: 'multi-select', phase: 'step2',
     stepLabel: bi('ප්‍රධාන අරමුණ', 'Primary Goal'),
     title: bi(
-      'ප්‍රධාන වශයෙන් ඔබ මෙයට සම්බන්ධ වීමට බලාපොරොත්තු වන්නේ කුමක් සඳහාද?',
-      'Primary goal for joining?'
+      'ප්‍රධාන වශයෙන් ඔබ මෙයට සම්බන්ධ වීමට බලාපොරොත්තු වන්නේ කුමක් සඳහාද? (අදාළ සියල්ල තෝරන්න)',
+      'Primary goals for joining? (Select all that apply)'
     ),
     choices: [
       { key: 'A', value: 'improve-skills', label: bi('මගේ මැහුම් කුසලතා වැඩිදියුණු කරගන්න', 'Improve my tailoring skills') },
@@ -274,12 +274,22 @@ const QUIZ_QUESTIONS = [
 // ── Branch helpers ────────────────────────────────────────────────────────────
 function isTechnicalBranch(a) {
   const techSit = ['learning', 'job', 'tailoring-biz'].includes(a.currentSituation);
-  const techGoal = ['improve-skills', 'advanced-techniques', 'start-earning', 'grow-tailoring-biz'].includes(a.primaryGoal);
+  let techGoal = false;
+  if (Array.isArray(a.primaryGoal)) {
+    techGoal = a.primaryGoal.some(g => ['improve-skills', 'advanced-techniques', 'start-earning', 'grow-tailoring-biz'].includes(g));
+  } else {
+    techGoal = ['improve-skills', 'advanced-techniques', 'start-earning', 'grow-tailoring-biz'].includes(a.primaryGoal);
+  }
   return techSit || techGoal;
 }
 function isBusinessBranch(a) {
   const bizSit = ['tailoring-biz', 'other-biz', 'planning'].includes(a.currentSituation);
-  const bizGoal = ['grow-tailoring-biz', 'grow-business-online', 'understand-tools', 'start-earning'].includes(a.primaryGoal);
+  let bizGoal = false;
+  if (Array.isArray(a.primaryGoal)) {
+    bizGoal = a.primaryGoal.some(g => ['grow-tailoring-biz', 'grow-business-online', 'understand-tools', 'start-earning'].includes(g));
+  } else {
+    bizGoal = ['grow-tailoring-biz', 'grow-business-online', 'understand-tools', 'start-earning'].includes(a.primaryGoal);
+  }
   return bizSit || bizGoal;
 }
 
@@ -366,12 +376,12 @@ window.Funnel = {
   },
 
   render: () => {
+    window.Funnel.updateProgressBar();
     if (state.phase === 'result') { window.Funnel.renderResult(); return; }
 
     const activeQ = window.Funnel.getActiveQuestions();
     const currentQ = activeQ[state.qIndex];
     const contentArea = document.getElementById('quiz-content-area');
-    const headerLabel = document.getElementById('quiz-progress-label');
     const navBar = document.getElementById('quiz-nav');
     const nextNavBtn = document.getElementById('btn-next-nav');
     if (nextNavBtn) nextNavBtn.style.display = 'none';
@@ -384,57 +394,12 @@ window.Funnel = {
       if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Header label
-    if (state.phase === 'step1') {
-      headerLabel.innerHTML = '';
-    } else {
-      const phaseLabel = state.phase === 'step2' ? 'Diagnostic' : 'Assessment';
-      headerLabel.innerHTML = `${phaseLabel} &mdash; ${state.qIndex + 1} / ${activeQ.length}`;
-    }
-
     contentArea.innerHTML = '';
 
-    // ── Registration form ──────────────────────────────────────────────────
-    if (currentQ.type === 'contact-block') {
-      navBar.style.display = 'none';
-      contentArea.innerHTML = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}" style="padding-top: 0.5rem; padding-bottom: 0.75rem;">
-          <h2 class="quiz-q-title" style="color:var(--rose-deep); margin-bottom:0.25rem;">Registration</h2>
-          <p style="color:var(--ink-muted); margin-bottom: 2rem; line-height: 1.5;">
-            නොමිලේ පැවැත්වෙන වැඩමුළුව සඳහා ලියාපදිංචි වෙමු<br>
-            <span style="font-size:0.85em; color:var(--ink-light);">Let's get you registered for the Free Workshop</span>
-          </p>
-          <form id="contact-form" onsubmit="window.Funnel.submitContact(event)">
-            <div class="contact-grid">
-              <div class="cf-field">
-                <label class="cf-label">සම්පූර්ණ නම / Full Name <span class="cf-req">*</span></label>
-                <input type="text" id="cf_name" class="cf-input" placeholder="ඔබේ නම / Your name" required>
-              </div>
-              <div class="cf-field">
-                <label class="cf-label">දුරකථන අංකය / WhatsApp Number <span class="cf-req">*</span></label>
-                <input type="tel" id="cf_phone" class="cf-input" placeholder="07XXXXXXXX" required>
-              </div>
-              <div class="cf-field">
-                <label class="cf-label">විද්‍යුත් තැපැල් / Email <span class="cf-req">*</span></label>
-                <input type="email" id="cf_email" class="cf-input" placeholder="you@email.com" required>
-              </div>
-              <div class="cf-field">
-                <label class="cf-label">දිස්ත්‍රික්කය / District or City <span class="cf-req">*</span></label>
-                <input type="text" id="cf_location" class="cf-input" placeholder="උදා: Badulla / Colombo" required>
-              </div>
-            </div>
-            <label class="cf-consent-label">
-              <input type="checkbox" id="cf_consent" required>
-              <span>Free Workshop එක ඉදිරි පියවරයන් පිළිබඳව මා හා සම්බන්ධ වීමට අවසර ලබා දෙමි. <br><em>I agree to be contacted about the workshop and next steps.</em></span>
-            </label>
-            <button type="submit" class="btn btn-primary cf-submit">Continue →</button>
-          </form>
-        </div>
-      `;
-    }
-
-    // ── Single-choice ─────────────────────────────────────────────────────
-    else if (currentQ.type === 'single-choice') {
+    // ── Diagnostic / Assessment Phase Logic ──────────────────────────────
+    // The registration form is natively embedded on the page now.
+    
+    if (currentQ.type === 'single-choice') {
       navBar.style.display = 'flex';
       const hasAnswer = state.answers[currentQ.field] !== undefined;
       if (hasAnswer && nextNavBtn) nextNavBtn.style.display = 'inline-flex';
@@ -520,7 +485,11 @@ window.Funnel = {
     state.answers.email = document.getElementById('cf_email').value;
     state.answers.location = document.getElementById('cf_location').value;
     window.Funnel.submitToWebhook(false);
-    window.Funnel.goNext();
+    
+    // Jump straight into the popup flow starting at step 2
+    state.phase = 'step2';
+    state.qIndex = 0;
+    window.Funnel.openQuiz();
   },
 
   selectSingle: (field, value) => {
@@ -613,21 +582,73 @@ window.Funnel = {
     const scores = calculateScores(state.answers);
     const contentArea = document.getElementById('quiz-content-area');
     document.getElementById('quiz-nav').style.display = 'none';
-    document.getElementById('quiz-header-progress').style.display = 'none';
+    const secureBadge = document.getElementById('secure-badge');
+    if (secureBadge) secureBadge.style.display = 'none';
+
     const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
+    const shareMessage = "ඔබටත් සාර්ථක ව්‍යාපාරයක් ගොඩනගන්න අවශ්‍යද? එහෙමත් නැත්නම් tailoring field එකෙන් ඉස්සරහට යන්න කැමතිද? ව්‍යාපාරික දැනුම වගේම අලුත්ම technical skills ඉගෙනගන්න, Su Collection සහ UVA VEC එකතුවෙලා කරන මේ නොමිලේ workshop එකට ඔයාත් සම්බන්ධ වෙන්න!\n\nලියාපදිංචි වීමට: https://su-collection.web.app";
+    const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+
     contentArea.innerHTML = `
-      <div class="quiz-result">
-        <div class="quiz-result-icon">✓</div>
-        <h2>ස්තූතියි, ${firstName}! <br><em style="font-size:1.2rem; font-style:normal;">Thank you!</em></h2>
-        <div class="quiz-result-route">${ROUTE_LABELS[scores.primary]}</div>
-        <p class="quiz-result-message">
-          ඔබේ තොරතුරු සාර්ථකව ලැබී ඇත. <br>
-          Workshop එකට සාදරයෙන් පිළිගනිමු!<br><br>
-          <em>Your details have been received. Our team will be in touch with your personalised growth path.</em>
-        </p>
-        <button class="btn btn-primary" onclick="window.Funnel.closeQuiz()">Back to Website</button>
+      <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="quiz-result-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <h2 style="line-height: 1.4; font-size: clamp(1.2rem, 4vw, 1.5rem);">නියමයි, ${firstName}!<br><em style="font-size:clamp(0.9rem, 3vw, 1.1rem); font-style:normal; font-weight:400; color:var(--md-sys-color-primary);">Registration Successful</em></h2>
+          <p class="quiz-result-message" style="margin-top: 0.5rem; margin-bottom: 0.5rem; line-height: 1.6; font-size: clamp(0.9rem, 3vw, 1rem);">
+            ඔබේ තොරතුරු අපට ලැබුණා. අපි ඔබේ පිළිතුරු analyze කරලා තියෙන්නේ. ඔබේ personalised growth path එක ඔස්සේ ඊළඟ පියවර ගැන දැනුවත් කරන්න අපේ team එක ඉතා ඉක්මනින් ඔබව සම්බන්ධ කරගන්නවා ඇත.<br><br>
+            <em>We look forward to seeing you at the workshop!</em>
+          </p>
+
+          <div style="margin-top: 0; padding: clamp(1rem, 3vw, 1.5rem); background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); box-shadow: var(--elevation-2); border-radius: 16px; display: inline-block; max-width: 400px; width: 100%; margin-left: auto; margin-right: auto;">
+            <p style="font-size: clamp(0.9rem, 3vw, 1rem); color: var(--md-sys-color-on-surface); margin-bottom: 0.25rem; font-weight: 600;">
+              ඔබේ මිතුරන්ටත් මේ ගැන කියන්න!
+            </p>
+            <p style="font-size: clamp(0.75rem, 2.5vw, 0.85rem); color: var(--md-sys-color-on-surface-variant); margin-bottom: clamp(0.75rem, 3vw, 1.25rem);">
+              Invite a friend to the free workshop
+            </p>
+            <a href="${shareUrl}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25D366; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 100px; font-weight: 600; font-family: var(--font-sans); text-decoration: none; width: 100%; box-shadow: var(--elevation-1); transition: transform 0.2s; font-size: clamp(0.85rem, 3vw, 1rem);">
+              <img src="whatsapp.png" alt="WhatsApp" style="width:22px; height:22px; object-fit:contain;">
+              Share on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--md-sys-color-outline-variant); font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); text-align: center;">
+          <strong>Su Collection & UVA VEC</strong><br>
+          <span style="font-size: 0.75rem; margin-top: 0.25rem; display: block;">© ${new Date().getFullYear()} All Rights Reserved.</span>
+        </div>
       </div>
     `;
+  },
+
+  updateProgressBar: () => {
+    // Update the small modal progress bar
+    const phaseLabelEl = document.getElementById('quiz-phase-label');
+    const fill = document.getElementById('quiz-progress-fill');
+    
+    if (state.phase === 'result') {
+      if (phaseLabelEl) phaseLabelEl.innerText = 'Complete';
+      if (fill) fill.style.width = '100%';
+      return;
+    }
+
+    const activeQ = window.Funnel.getActiveQuestions();
+    const currentQ = activeQ[state.qIndex];
+    if (!currentQ) return;
+
+    const phaseLabel = state.phase === 'step2' ? 'Diagnostic' : 'Assessment';
+    if (phaseLabelEl) phaseLabelEl.innerText = phaseLabel;
+    
+    // Calculate global progress based on the total number of questions in QUIZ_QUESTIONS
+    // contact-block is index 0 (which is skipped now), so total questions is length - 1.
+    const globalIdx = QUIZ_QUESTIONS.findIndex(q => q.id === currentQ.id);
+    const totalQ = QUIZ_QUESTIONS.length - 1; 
+    let percent = Math.round((globalIdx / totalQ) * 100);
+    if (percent < 5) percent = 5; // ensure it's at least visible
+    
+    if (fill) fill.style.width = `${percent}%`;
   },
 
   renderPathPanel: () => {
@@ -665,8 +686,6 @@ window.Funnel = {
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const popup = document.getElementById('promo-popup');
-    if (popup && !state.isOpen) popup.style.display = 'flex';
-  }, 1500);
+  // We no longer automatically start rendering the funnel questions, 
+  // because step 1 is a static HTML form that triggers the funnel on submit.
 });
