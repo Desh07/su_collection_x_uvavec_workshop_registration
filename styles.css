@@ -105,7 +105,7 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 .form-card-container { flex: 1.2; min-width: 320px; }
 
 /* Title Area */
-.title-area { margin-bottom: 3rem; }
+.title-area { margin-bottom: 0; }
 .eyebrow-text { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; color: var(--rose-deep); text-transform: uppercase; margin-bottom: 1rem; }
 .main-title { font-size: clamp(2.5rem, 6vw, 4rem); line-height: 1.1; margin-bottom: 1.5rem; color: var(--ink); font-weight: 600; }
 .main-desc { max-width: 400px; font-size: 1.05rem; color: var(--ink-muted); line-height: 1.6; }
