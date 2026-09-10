@@ -496,6 +496,11 @@ window.Funnel = {
               ${triggerText}
             </div>
           </div>
+          ${hasSelection ? `
+          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
+            <button class="quiz-ok-btn" id="select-ok" onclick="window.Funnel.goNext()" style="${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
+          </div>
+          ` : ''}
         </div>
       `;
       
