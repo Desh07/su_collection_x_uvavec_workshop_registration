@@ -7,7 +7,7 @@
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwTDfrks1x-dRDNnwsGQLJuP8h6PZgoJn49w6VySphaO_Yp7oZoQ-en9bpKx7EeuBi52g/exec";
 
 // Helper: bilingual label
-const bi = (sin, eng) => `<span class="sin">${sin}</span><br><span class="eng">${eng}</span>`;
+const bi = (sin, eng) => `<span class="sin">${sin}</span><span class="eng">${eng}</span>`;
 
 const QUIZ_QUESTIONS = [
   {
