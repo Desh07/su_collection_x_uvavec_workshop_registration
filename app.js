@@ -14,21 +14,21 @@ const QUIZ_QUESTIONS = [
     id: 'CONTACT-NAME', field: 'name', type: 'short-text', phase: 'step1',
     stepLabel: bi('සම්පූර්ණ නම', 'Full Name'),
     title: bi('සම්පූර්ණ නම', 'Full Name'),
-    placeholder: 'උදා: නදීශා / e.g. Nadeesha',
+    placeholder: 'උදා: නදීශා විජේරත්න / e.g. Nadeesha Wijeratna',
     optional: false,
   },
   {
     id: 'CONTACT-PHONE', field: 'phone', type: 'short-text', phase: 'step1',
-    stepLabel: bi('දුරකථන අංකය', 'Mobile / WhatsApp Number'),
-    title: bi('දුරකථන අංකය', 'Mobile / WhatsApp Number'),
+    stepLabel: bi('WhatsApp අංකය', 'WhatsApp Number'),
+    title: bi('WhatsApp අංකය', 'WhatsApp Number'),
     placeholder: '07XXXXXXXX',
     optional: false,
   },
   {
     id: 'CONTACT-EMAIL', field: 'email', type: 'short-text', phase: 'step1',
-    stepLabel: bi('විද්‍යුත් තැපැල් ලිපිනය', 'Email Address'),
-    title: bi('විද්‍යුත් තැපැල් ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Not Mandatory)'),
-    placeholder: 'ඊමේල් (අනිවාර්ය නොවේ) / Email (Optional)',
+    stepLabel: bi('ඊමේල් ලිපිනය', 'Email Address'),
+    title: bi('ඊමේල් ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Optional)'),
+    placeholder: 'උදා: nadeeshawijeratna@gmail.com',
     optional: true,
   },
   {
@@ -522,11 +522,12 @@ window.Funnel = {
           <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
             placeholder="${currentQ.placeholder || ''}"
             value="${existing}"
-            oninput="window.Funnel.saveText('${currentQ.field}', this.value)">
+            oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
+            onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
           <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
             කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>
           </div>
-          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
+          <div style="display:flex; justify-content:center; gap:1rem; margin-top:0.75rem;">
             ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
             <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
           </div>

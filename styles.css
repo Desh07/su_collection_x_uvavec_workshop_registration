@@ -187,6 +187,9 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 .btn-skip { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.8rem 1.8rem; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; border-radius: var(--r-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; cursor: pointer; box-shadow: var(--elevation-1); transition: all 0.2s var(--ease); }
 .btn-skip:hover { background: #D46864; color: var(--md-sys-color-on-primary); box-shadow: var(--elevation-2); transform: translateY(-1px); }
 
+.btn-next { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.8rem 1.8rem; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; border-radius: var(--r-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; cursor: pointer; box-shadow: var(--elevation-1); transition: all 0.2s var(--ease); }
+.btn-next:hover { background: #D46864; color: var(--md-sys-color-on-primary); box-shadow: var(--elevation-2); transform: translateY(-1px); }
+
 /* Short-text input */
 .quiz-text-input { width: 100%; padding: 1rem; border: 1px solid var(--md-sys-color-outline); border-radius: 4px; font-family: var(--font-sans); font-size: 1rem; color: var(--md-sys-color-on-surface); transition: border-color 0.2s; background: transparent; margin-top: 0.5rem; }
 .quiz-text-input:focus { border-color: var(--md-sys-color-primary); border-width: 2px; padding: calc(1rem - 1px); outline: none; }
