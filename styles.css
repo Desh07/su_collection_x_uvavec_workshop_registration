@@ -218,6 +218,13 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 .quiz-result-message { font-family: var(--font-sans); }
 
 @media (max-width: 768px) {
+  .top-header { padding: 0.6rem 1rem; }
+  .main-content { padding-top: 75px; padding-bottom: 2rem; }
+  .main-title { font-size: clamp(1.6rem, 7vw, 2.2rem); margin-bottom: 0.5rem; }
+  .main-desc { font-size: 0.9rem; margin-bottom: 1rem; }
+  .form-card-box { padding: 1.25rem 1rem !important; }
+  .event-date-block { margin-bottom: 1rem !important; }
+
   .quiz-shell-wide {
     width: 100vw;
     height: 100dvh;

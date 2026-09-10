@@ -74,12 +74,12 @@ const QUIZ_QUESTIONS = [
     stepLabel: bi('කුසලතා මට්ටම', 'Skill Level'),
     title: bi('දැනට ඔයාගෙ skill level එක කොහොමද?', 'Current tailoring skill level'),
     choices: [
-      { key: 'A', value: 'beginner', label: bi('තාම මම ආධුනිකයි / දැන් පටන් ගන්නවා', 'Beginner / just starting') },
-      { key: 'B', value: 'job', label: bi('මම මැහුම් ක්ෂේත්‍රයේ රැකියාවක් කරනවා', 'I work in the tailoring field') },
-      { key: 'C', value: 'business', label: bi('මම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් දැනටමත් කරනවා', 'I already run a tailoring-related business') },
-      { key: 'D', value: 'planning-tailoring', label: bi('ලඟදීම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් පටන්ගන්න plan කරනවා', 'I\'m planning to start a tailoring-related business soon.') },
-      { key: 'E', value: 'planning-other', label: bi('මැහුම් නොවන වෙනත් ව්‍යාපාරයක් කරන්න බලාපොරොත්තුවෙන් සිටිනවා', 'I\'m hoping to start a different (non-tailoring) business') },
-      { key: 'F', value: 'not-decided', label: bi('තාම තීරණය කරලා නෑ', 'I haven\'t decided yet') },
+      { key: 'A', value: 'beginner', label: bi('තාම මම ආධුනිකයි / අලුතින්ම ඉගෙන ගන්නවා', 'Beginner / just starting') },
+      { key: 'B', value: 'basic', label: bi('මූලික දැනුම තිබෙනවා, තව ඉගෙනීමට බලාපොරොත්තු වෙනවා', 'I have basic knowledge and want to learn more') },
+      { key: 'C', value: 'intermediate', label: bi('මූලික මැහුම් කරන්න පුලුවන්, නමුත් තව වැඩිදියුණු කරගන්න කැමතියි', 'I can do basic tailoring but want to improve') },
+      { key: 'D', value: 'regular', label: bi('නිතරම මැහුම් කටයුතු වල නිරත වෙනවා', 'I regularly do tailoring') },
+      { key: 'E', value: 'professional', label: bi('වෘත්තීය මට්ටමින් මැහුම් කටයුතු කරනවා', 'I work professionally in tailoring') },
+      { key: 'F', value: 'experienced', label: bi('හොඳ පළපුරුද්දක් තියනව, තවත් වෘත්තීය කුසලතා ඉගෙනීමට කැමතියි', 'I’m experienced and want to learn advanced skills') },
     ]
   }
 ];
@@ -210,10 +210,12 @@ window.Funnel = {
         `;
       });
       html += `</div>
-        <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
-          ${state.multiVals.length === 0 ? 'disabled' : ''} style="${isLastQ ? 'background:#000;color:#fff;' : ''}">
-          ${isLastQ ? 'Submit' : 'OK'}
-        </button>
+        <div style="position: sticky; bottom: 0; padding-top: 0.5rem; background: var(--md-sys-color-surface); z-index: 5;">
+          <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
+            ${state.multiVals.length === 0 ? 'disabled' : ''} style="width: 100%; margin-top: 0.5rem; ${isLastQ ? 'background:#000;color:#fff;' : ''}">
+            ${isLastQ ? 'Submit' : 'OK'}
+          </button>
+        </div>
       </div>`;
       contentArea.innerHTML = html;
     }
@@ -533,6 +535,11 @@ window.Funnel = {
           </div>
         </div>
       `;
+      
+      setTimeout(() => {
+        const inputEl = document.getElementById('short-text-input');
+        if (inputEl && !isSameQ) inputEl.focus();
+      }, 50);
     }
   },
 
@@ -687,7 +694,7 @@ window.Funnel = {
     const currentQ = activeQ[state.qIndex];
     if (!currentQ) return;
 
-    if (phaseLabelEl) phaseLabelEl.innerHTML = currentQ.stepLabel;
+    if (phaseLabelEl) phaseLabelEl.innerHTML = `Step ${state.qIndex + 1} of ${activeQ.length} &mdash; ${currentQ.stepLabel}`;
     
 
     let percent = Math.round(((state.qIndex) / (activeQ.length)) * 100);
@@ -719,11 +726,11 @@ window.Funnel = {
 
     const skillMap = {
       'beginner': 'Beginner / just starting',
-      'job': 'I work in the tailoring field',
-      'business': 'I already run a tailoring-related business',
-      'planning-tailoring': 'I\'m planning to start a tailoring-related business soon.',
-      'planning-other': 'I\'m hoping to start a different (non-tailoring) business',
-      'not-decided': 'I haven\'t decided yet'
+      'basic': 'I have basic knowledge and want to learn more',
+      'intermediate': 'I can do basic tailoring but want to improve',
+      'regular': 'I regularly do tailoring',
+      'professional': 'I work professionally in tailoring',
+      'experienced': 'I’m experienced and want to learn advanced skills'
     };
 
     const readableSit = sitMap[state.answers.currentSituation] || state.answers.currentSituation;
