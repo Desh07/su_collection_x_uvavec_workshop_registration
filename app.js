@@ -522,6 +522,7 @@ window.Funnel = {
           <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
             placeholder="${currentQ.placeholder || ''}"
             value="${existing}"
+            onfocus="setTimeout(() => { this.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 300)"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
             onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
           <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
