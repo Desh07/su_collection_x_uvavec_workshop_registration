@@ -198,6 +198,52 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 /* Short-text input */
 .quiz-text-input { width: 100%; padding: 1rem; border: 1px solid var(--md-sys-color-outline); border-radius: 4px; font-family: var(--font-sans); font-size: 1rem; color: var(--md-sys-color-on-surface); transition: border-color 0.2s; background: transparent; margin-top: 0.5rem; }
 .quiz-text-input:focus { border-color: var(--md-sys-color-primary); border-width: 2px; padding: calc(1rem - 1px); outline: none; }
+.iti { width: 100%; }
+.iti--container { z-index: 99999 !important; }
+
+/* Force intl-tel-input fullscreen popup to match our custom modals */
+.iti--fullscreen-popup {
+  background: rgba(0,0,0,0.4) !important;
+  backdrop-filter: blur(6px) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 1.5rem !important;
+}
+.iti--fullscreen-popup .iti__dropdown-content {
+  background: var(--md-sys-color-surface) !important;
+  width: 100% !important;
+  max-width: 450px !important;
+  max-height: 60dvh !important;
+  border-radius: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-shadow: var(--elevation-4) !important;
+  overflow: hidden !important;
+  animation: zoomIn 0.3s var(--ease) both !important;
+  position: relative !important;
+  top: auto !important; bottom: auto !important; left: auto !important; right: auto !important;
+  margin: 0 !important;
+}
+.iti--fullscreen-popup .iti__search-input {
+  padding: 1rem 1.5rem !important;
+  border: none !important;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant) !important;
+  font-family: var(--font-sans) !important;
+  background: #fbf7f5 !important;
+  border-radius: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.iti--fullscreen-popup .iti__country-list {
+  padding: 0.5rem 0 !important;
+}
+.iti--fullscreen-popup .iti__country {
+  padding: 0.85rem 1.25rem !important;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+}
 .quiz-text-input[type="number"]::-webkit-inner-spin-button, .quiz-text-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .quiz-text-input[type="number"] { -moz-appearance: textfield; }
 .custom-select-trigger { cursor: pointer; display: flex; align-items: center; justify-content: space-between; }

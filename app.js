@@ -539,6 +539,19 @@ window.Funnel = {
       
       setTimeout(() => {
         const inputEl = document.getElementById('short-text-input');
+        
+        if (currentQ.field === 'phone' && inputEl) {
+          if (window.iti) { window.iti.destroy(); }
+          
+          window.iti = window.intlTelInput(inputEl, {
+            initialCountry: "lk",
+            strictMode: true,
+            useFullscreenPopup: true,
+            dropdownContainer: document.body,
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js"
+          });
+        }
+        
         if (inputEl && !isSameQ) inputEl.focus();
       }, 50);
     }
@@ -594,9 +607,28 @@ window.Funnel = {
     const currentQ = activeQ[state.qIndex];
 
     if (currentQ && currentQ.field === 'phone') {
-      const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
-      const isNum = /^\+?\d+$/.test(val);
-      if (!isNum) {
+      let isValid = false;
+      if (window.iti) {
+        isValid = window.iti.isValidNumber();
+        
+        // Strict Mobile Prefix Check
+        if (isValid) {
+          const numberType = window.iti.getNumberType(); // Returns integer
+          // 1 = MOBILE, 2 = FIXED_LINE_OR_MOBILE (Used in US/Canada)
+          if (numberType !== 1 && numberType !== 2) {
+            isValid = false; // Reject if it's a legacy landline, pager, or fake prefix
+          }
+        }
+        
+        if (isValid) {
+          state.answers['phone'] = window.iti.getNumber();
+        }
+      } else {
+        const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
+        isValid = /^\+?\d+$/.test(val) && val.length >= 8;
+      }
+      
+      if (!isValid) {
         const errDiv = document.getElementById('short-text-error');
         if (errDiv) errDiv.style.display = 'block';
         return;

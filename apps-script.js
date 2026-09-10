@@ -26,11 +26,14 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     
+    // Prevent Google Sheets from treating the '+' as a math formula
+    var safePhone = data.phone ? "'" + data.phone : "";
+    
     // Prepare the row data
     var rowData = [
       new Date(), // Timestamp
       data.name || "",
-      data.phone || "",
+      safePhone,
       data.email || "",
       data.country || "",
       data.district || "",
