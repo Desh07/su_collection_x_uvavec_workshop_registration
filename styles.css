@@ -166,8 +166,8 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 /* Dynamic Questions */
 .quiz-question { animation: slideUp 0.35s var(--ease) both; padding: 1.5rem 2rem; }
 .quiz-question.no-anim { animation: none; }
-.quiz-q-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rose); margin-bottom: 0.75rem; display: block; }
-.quiz-q-title { font-family: var(--font-serif); font-size: clamp(1.2rem, 2.5vw, 1.55rem); color: var(--ink); margin-bottom: 1.5rem; line-height: 1.4; }
+.quiz-q-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rose); margin-bottom: 0.5rem; display: block; }
+.quiz-q-title { font-family: var(--font-serif); font-size: clamp(1.15rem, 2.5vw, 1.55rem); color: var(--ink); margin-bottom: 1rem; line-height: 1.3; }
 .quiz-choices { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.5rem; }
 .quiz-choice { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--r-sm); cursor: pointer; background: var(--md-sys-color-surface); width: 100%; text-align: left; transition: background 0.2s var(--ease); font-family: var(--font-sans); }
 .quiz-choice:hover { background: var(--md-sys-color-surface-variant); transform: none; }
@@ -222,11 +222,21 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
   }
   .quiz-header-bar {
     border-radius: 0;
+    padding: 0.75rem 1.25rem;
   }
   .quiz-question {
-    padding-top: 3.5rem;
+    padding: 1rem 1.25rem;
   }
   .quiz-nav {
     border-radius: 0;
+    position: static;
+    padding: 1rem 1.25rem;
   }
+  /* Scale down the event date block specifically inside the mobile modal to save space */
+  #quiz-intro-text .event-date-block { margin-bottom: 0.5rem !important; gap: 0.5rem; }
+  #quiz-intro-text .event-date-cal { padding: 0.3rem 0.75rem; }
+  #quiz-intro-text .event-date-day { font-size: 1.5rem; }
+  #quiz-intro-text .event-date-time { font-size: 0.9rem !important; }
+  #quiz-intro-text .event-date-desc { font-size: 0.75rem !important; }
+  #quiz-intro-text h2 { font-size: 1.1rem !important; margin-bottom: 0 !important; }
 }
