@@ -218,7 +218,7 @@ window.Funnel = {
       contentArea.innerHTML = html;
     }
     else if (currentQ.type === 'country-select' || currentQ.type === 'district-select') {
-      navBar.style.display = 'flex';
+      navBar.style.display = state.qIndex === 0 ? 'none' : 'flex';
       const existing = state.answers[currentQ.field] || '';
       const hasSelection = existing.trim().length > 0;
       
@@ -510,7 +510,7 @@ window.Funnel = {
       }
     }
     else if (currentQ.type === 'short-text') {
-      navBar.style.display = 'flex';
+      navBar.style.display = state.qIndex === 0 ? 'none' : 'flex';
       const existing = state.answers[currentQ.field] || '';
       const hasText = existing.trim().length > 0;
 
