@@ -649,10 +649,19 @@ window.Funnel = {
       <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align:center;">
 
-          <h2 style="line-height: 1.4; font-size: clamp(1.2rem, 4vw, 1.5rem);">නියමයි, ${firstName}! 🎉<br><em style="font-size:clamp(0.9rem, 3vw, 1.1rem); font-style:normal; font-weight:400; color:var(--md-sys-color-primary);">Registration Successful</em></h2>
-          <p class="quiz-result-message" style="margin-top: 1rem; margin-bottom: 2rem; line-height: 1.6; font-size: clamp(0.9rem, 3vw, 1rem);">
-            ඔයාගේ විස්තර අපිට ලැබුණා. දැන් ඔයාට තියෙන්නේ අපේ නිල WhatsApp group එකට එකතු වෙන්න විතරයි. Workshop එකට අදාල හැම විස්තරයක්ම අපි ඒ group එකට දානවා.<br><br>
-            <em>Click the button below to join the WhatsApp group!</em>
+          <h2 style="line-height: 1.4; font-size: clamp(1.4rem, 4.5vw, 1.8rem); color: var(--md-sys-color-primary); font-family: var(--font-sans);">සුබ පැතුම්!</h2>
+          <h3 style="font-size: clamp(1.1rem, 3.5vw, 1.3rem); margin-top: 0.5rem; line-height: 1.5; font-family: var(--font-sans); font-weight: 600;">
+            ඔබගේ ලියාපදිංචිය සාර්ථකයි..<br>
+            <span style="font-weight:400; color:var(--ink-muted); font-size: 0.9em;">Registration Successful!</span>
+          </h3>
+
+          <div style="background: var(--md-sys-color-surface-variant); padding: 1.25rem; border-radius: 12px; margin: 2rem 0; width: 100%; text-align: center;">
+            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--ink);">📅 Workshop Details</div>
+            <div style="font-size: 0.95rem; color: var(--ink-muted); font-weight: 500;">Saturday | September 19 | 6:00 PM – 7:30 PM</div>
+          </div>
+
+          <p class="quiz-result-message" style="margin-bottom: 2rem; line-height: 1.6; font-size: clamp(0.95rem, 3vw, 1.05rem); max-width: 400px; color: var(--ink);">
+            Workshop එකට අදාළ updates, reminders සහ වැදගත් තොරතුරු දැනගන්න අපගේ නිල WhatsApp Group එකට JOIN වෙන්න
           </p>
 
           <a href="${groupLink}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; background-color:#25D366; color:#fff; border:none; padding:1rem 2rem; border-radius:30px; text-decoration:none; font-weight:700; font-size:1.1rem; width:100%; max-width:350px;">
