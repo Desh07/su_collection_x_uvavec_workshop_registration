@@ -26,8 +26,8 @@ const QUIZ_QUESTIONS = [
   },
   {
     id: 'CONTACT-EMAIL', field: 'email', type: 'short-text', phase: 'step1',
-    stepLabel: bi('ඊමේල් ලිපිනය', 'Email Address'),
-    title: bi('ඊමේල් ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Optional)'),
+    stepLabel: bi('Email ලිපිනය', 'Email Address'),
+    title: bi('Email ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Optional)'),
     placeholder: 'උදා: nadeeshawijeratna@gmail.com',
     optional: true,
   },
@@ -40,7 +40,7 @@ const QUIZ_QUESTIONS = [
   {
     id: 'CONTACT-DISTRICT', field: 'district', type: 'district-select', phase: 'step1',
     stepLabel: bi('දිස්ත්‍රික්කය', 'District'),
-    title: bi('ඔයා ඉන්නේ ලංකාවේ කොහේද?', 'Which district are you from?'),
+    title: bi('දිස්ත්‍රික්කය සඳහන් කරන්න', 'Which district are you from?'),
     showIf: (a) => a.country === 'Sri Lanka',
     optional: false,
   },
@@ -60,7 +60,7 @@ const QUIZ_QUESTIONS = [
   {
     id: 'DIAG-02', field: 'primaryGoal', type: 'multi-select', phase: 'step1',
     stepLabel: bi('අරමුණ', 'Primary Goal'),
-    title: bi('ප්‍රධාන වශයෙන්ම ඔයා මේකට සම්බන්ධ වෙලා කරන්න බලාපොරොතු වෙන්නෙ මොකක්ද?', 'Primary goal for joining?'),
+    title: bi('ඇයි ඔයා මේකට සම්බන්ධ වෙන්නෙ?', 'Primary goal for joining?'),
     choices: [
       { key: 'A', value: 'improve-skills', label: bi('මැහුම් කුසලතා වැඩිදියුණු කරගන්න', 'Improve my tailoring skills') },
       { key: 'B', value: 'advanced-techniques', label: bi('විධිමත් ක්‍රමයට සංකීර්ණ මැහුම් ක්‍රම පහසුවෙන් ඉගෙනගන්න', 'Learn advanced tailoring techniques') },
@@ -77,7 +77,7 @@ const QUIZ_QUESTIONS = [
       { key: 'A', value: 'beginner', label: bi('තාම මම ආධුනිකයි / දැන් පටන් ගන්නවා', 'Beginner / just starting') },
       { key: 'B', value: 'job', label: bi('මම මැහුම් ක්ෂේත්‍රයේ රැකියාවක් කරනවා', 'I work in the tailoring field') },
       { key: 'C', value: 'business', label: bi('මම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් දැනටමත් කරනවා', 'I already run a tailoring-related business') },
-      { key: 'D', value: 'planning-tailoring', label: bi('ලඟදීම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් පටන්ගන්න සැලසුම් කරනවා', 'I\'m planning to start a tailoring-related business soon.') },
+      { key: 'D', value: 'planning-tailoring', label: bi('ලඟදීම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් පටන්ගන්න plan කරනවා', 'I\'m planning to start a tailoring-related business soon.') },
       { key: 'E', value: 'planning-other', label: bi('මැහුම් නොවන වෙනත් ව්‍යාපාරයක් කරන්න බලාපොරොත්තුවෙන් සිටිනවා', 'I\'m hoping to start a different (non-tailoring) business') },
       { key: 'F', value: 'not-decided', label: bi('තාම තීරණය කරලා නෑ', 'I haven\'t decided yet') },
     ]
@@ -525,7 +525,7 @@ window.Funnel = {
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
             onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
           <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
-            කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>
+            ${currentQ.field === 'email' ? 'නිවැරදි Email ලිපිනයක් යොමු කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid email address</span>' : 'කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>'}
           </div>
           <div style="display:flex; justify-content:center; gap:1rem; margin-top:0.75rem;">
             ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
@@ -592,6 +592,16 @@ window.Funnel = {
         const errDiv = document.getElementById('short-text-error');
         if (errDiv) errDiv.style.display = 'block';
         return;
+      }
+    } else if (currentQ && currentQ.field === 'email') {
+      const val = (state.answers['email'] || '').trim();
+      if (val.length > 0) {
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        if (!isEmail) {
+          const errDiv = document.getElementById('short-text-error');
+          if (errDiv) errDiv.style.display = 'block';
+          return;
+        }
       }
     }
     

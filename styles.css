@@ -32,8 +32,8 @@
   --border: var(--md-sys-color-outline-variant); 
   --glass: rgba(255, 255, 255, 0.75);
 
-  --font-serif: 'Roboto', sans-serif;
-  --font-sans: 'Roboto', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', 'Noto Sans Sinhala', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Material 3 Shapes */
   --r-xs: 4px;
