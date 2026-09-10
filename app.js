@@ -454,7 +454,7 @@ window.Funnel = {
       const optionMatches = [...optionsHtml.matchAll(/<option value="([^"]*)"(?:[^>]*)>(.*?)<\/option>/g)];
       let customOptionsHtml = optionMatches.map(m => {
         if (m[1] === '') return ''; // skip the disabled placeholder
-        return `<div class="custom-select-option" onclick="window.Funnel.saveText('${currentQ.field}', '${m[1]}'); document.getElementById('custom-select-trigger').innerHTML='${m[2]}'; document.getElementById('custom-select-modal').style.display='none'; document.getElementById('select-ok').style.display='inline-flex';">${m[2]}</div>`;
+        return `<div class="custom-select-option" onclick="window.Funnel.saveText('${currentQ.field}', '${m[1]}'); document.getElementById('custom-select-modal').style.display='none'; window.Funnel.goNext();">${m[2]}</div>`;
       }).join('');
       
       let triggerText = 'තෝරන්න / Select...';
@@ -495,9 +495,6 @@ window.Funnel = {
             <div id="custom-select-trigger" class="quiz-text-input custom-select-trigger" onclick="document.getElementById('custom-select-modal').style.display = 'flex';">
               ${triggerText}
             </div>
-          </div>
-          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
-            <button class="quiz-ok-btn" id="select-ok" onclick="window.Funnel.goNext()" style="${hasSelection ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
           </div>
         </div>
       `;
