@@ -108,13 +108,18 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 /* Desktop Split Layout */
 .desktop-split-layout { display: flex; flex-direction: column; gap: 1.5rem; width: 100%; }
 @media (min-width: 992px) {
-  .desktop-split-layout { flex-direction: row; align-items: center; justify-content: space-between; gap: 4rem; max-width: 1100px; margin: 0 auto; text-align: left; }
+  body, html { overflow: hidden; height: 100vh; }
+  .page-wrapper { height: 100vh; overflow: hidden; }
+  .main-content { padding-top: 85px; padding-bottom: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+  .desktop-split-layout { flex: 1; flex-direction: row; align-items: center; justify-content: space-between; gap: 4rem; max-width: 1100px; margin: 0 auto; text-align: left; max-height: calc(100vh - 100px); }
   .desktop-split-layout .title-area { flex: 1.2; text-align: left; margin-bottom: 0; }
-  .desktop-split-layout .main-desc { margin: 0 0 2rem 0; font-size: 1.15rem; }
-  .desktop-split-layout .form-card-container { flex: 0 0 480px; }
-  .main-content { padding-top: 140px; } /* More space for desktop header */
-  .event-date-block { flex-direction: row; text-align: left; gap: 1.25rem; }
+  .main-title { font-size: clamp(2rem, 3.5vw, 3.2rem); margin-bottom: 1rem; line-height: 1.1; }
+  .desktop-split-layout .main-desc { margin: 0 0 1.5rem 0; font-size: clamp(0.95rem, 1.2vw, 1.05rem); line-height: 1.6; }
+  .desktop-split-layout .form-card-container { flex: 0 0 450px; }
+  .form-card-box { padding: 1.5rem 2.5rem !important; }
+  .event-date-block { margin-bottom: 1.25rem !important; flex-direction: row; text-align: left; gap: 1.25rem; }
   .event-date-text { text-align: left; }
+  .secure-badge { margin-top: 1.5rem !important; padding-top: 1rem !important; }
 }
 
 .event-date-block { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 2rem; text-align: center; }
