@@ -2,347 +2,85 @@
 // SU COLLECTION x UVA VEC - Vanilla JS Funnel
 // ==========================================
 
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxq4lWD0PxGjoOg1uG6BDETxRbIqYLCfIkA1IV_tqnG7nlusR-1iYx-tbXJdGM8kFE/exec";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwTDfrks1x-dRDNnwsGQLJuP8h6PZgoJn49w6VySphaO_Yp7oZoQ-en9bpKx7EeuBi52g/exec";
 
 // Helper: bilingual label
 const bi = (sin, eng) => `<span class="sin">${sin}</span><br><span class="eng">${eng}</span>`;
 
 const QUIZ_QUESTIONS = [
-  // ── STEP 1: Registration ─────────────────────────────────────────────────
   {
-    id: 'contact', field: '_contact', type: 'contact-block', phase: 'step1',
-    stepLabel: 'Registration',
-    title: 'Let\'s get you registered for the Free Workshop'
+    id: 'CONTACT-NAME', field: 'name', type: 'short-text', phase: 'step1',
+    stepLabel: bi('සම්පූර්ණ නම', 'Full Name'),
+    title: bi('සම්පූර්ණ නම', 'Full Name'),
+    placeholder: 'උදා: නදීශා / e.g. Nadeesha',
+    optional: false,
   },
-
-  // ── STEP 2: Diagnostic ───────────────────────────────────────────────────
   {
-    id: 'REG-05', field: 'currentSituation', type: 'single-choice', phase: 'step2',
-    stepLabel: bi('ඔබව හොඳින් විස්තර කරන්නේ:', 'Which best describes you?'),
-    title: bi(
-      'ඔබව වඩාත් හොඳින් විස්තර කරන්නේ පහත කුමක්ද?',
-      'Which best describes you?'
-    ),
+    id: 'CONTACT-PHONE', field: 'phone', type: 'short-text', phase: 'step1',
+    stepLabel: bi('දුරකථන අංකය', 'Mobile / WhatsApp Number'),
+    title: bi('දුරකථන අංකය', 'Mobile / WhatsApp Number'),
+    placeholder: '07XXXXXXXX',
+    optional: false,
+  },
+  {
+    id: 'CONTACT-EMAIL', field: 'email', type: 'short-text', phase: 'step1',
+    stepLabel: bi('විද්‍යුත් තැපැල් ලිපිනය', 'Email Address'),
+    title: bi('විද්‍යුත් තැපැල් ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Not Mandatory)'),
+    placeholder: 'ඔයාගේ ඊමේල් එක (අනිවාර්ය නෑ) / Optional',
+    optional: true,
+  },
+  {
+    id: 'CONTACT-COUNTRY', field: 'country', type: 'country-select', phase: 'step1',
+    stepLabel: bi('රට', 'Country'),
+    title: bi('ඔබ පදිංචි රට (ශ්‍රී ලංකාව නම් දිස්ත්‍රික්කය සඳහන් කරන්න)', 'Country'),
+    optional: false,
+  },
+  {
+    id: 'CONTACT-DISTRICT', field: 'district', type: 'district-select', phase: 'step1',
+    stepLabel: bi('දිස්ත්‍රික්කය', 'District'),
+    title: bi('ඔයා ඉන්නේ ලංකාවේ කොහේද?', 'Which district are you from?'),
+    showIf: (a) => a.country === 'Sri Lanka',
+    optional: false,
+  },
+  {
+    id: 'DIAG-01', field: 'currentSituation', type: 'single-choice', phase: 'step1',
+    stepLabel: bi('ඔයා ගැන', 'About You'),
+    title: bi('ඔයා ගැන වැඩියෙන්ම විස්තර කරන්නෙ කොහොමද?', 'Which best describes you?'),
     choices: [
       { key: 'A', value: 'learning', label: bi('මම මැහුම් කටයුතු ඉගෙන ගන්නවා', 'I am learning tailoring') },
       { key: 'B', value: 'job', label: bi('මම මැහුම් කටයුතු රැකියාවක් හෝ සේවාවක් විදිහට කරනවා', 'I do tailoring as a job or service') },
-      { key: 'C', value: 'tailoring-biz', label: bi('මම මැහුම් කටයුතු හෝ මැහුම් සම්බන්ධ ව්‍යාපාරයක් කරනවා', 'I run a tailoring or clothing-related business') },
+      { key: 'C', value: 'tailoring-biz', label: bi('මම මැහුම් කටයුතු හා සම්බන්ධ ව්‍යාපාරයක් කරනවා', 'I run a tailoring or clothing-related business') },
       { key: 'D', value: 'other-biz', label: bi('මම වෙනත් කුඩා ව්‍යාපාරයක් කරනවා', 'I run another small business') },
-      { key: 'E', value: 'planning', label: bi('මම ව්‍යාපාරයක් පටන් ගන්න සැලසුම් කරනවා', 'I am planning to start a business') },
-      { key: 'F', value: 'other', label: bi('වෙනත් / තාම තීරණය කරලා නැහැ', 'Other / not sure yet') },
+      { key: 'E', value: 'planning', label: bi('මම ව්‍යාපාරයක් පටන් ගන්න plan කරනවා', 'I am planning to start a business') },
+      { key: 'F', value: 'other', label: bi('වෙනත් / තාම තීරණයක් අරගෙන නෑ', 'Other / not sure yet') },
     ]
   },
   {
-    id: 'REG-06', field: 'primaryGoal', type: 'multi-select', phase: 'step2',
-    stepLabel: bi('ප්‍රධාන අරමුණ', 'Primary Goal'),
-    title: bi(
-      'ප්‍රධාන වශයෙන් ඔබ මෙයට සම්බන්ධ වීමට බලාපොරොත්තු වන්නේ කුමක් සඳහාද? (අදාළ සියල්ල තෝරන්න)',
-      'Primary goals for joining? (Select all that apply)'
-    ),
+    id: 'DIAG-02', field: 'primaryGoal', type: 'multi-select', phase: 'step1',
+    stepLabel: bi('අරමුණ', 'Primary Goal'),
+    title: bi('ප්‍රධාන වශයෙන්ම ඔයා මේකට සම්බන්ධ වෙලා කරන්න බලාපොරොතු වෙන්නෙ මොකක්ද?', 'Primary goal for joining?'),
     choices: [
-      { key: 'A', value: 'improve-skills', label: bi('මගේ මැහුම් කුසලතා වැඩිදියුණු කරගන්න', 'Improve my tailoring skills') },
-      { key: 'B', value: 'advanced-techniques', label: bi('උසස් මට්ටමේ මැහුම් ක්‍රම ඉගෙන ගන්න', 'Learn advanced tailoring techniques') },
-      { key: 'C', value: 'start-earning', label: bi('මැහුම් කටයුතු හරහා ආදායමක් උපයන්න පටන් ගන්න', 'Start earning through tailoring') },
+      { key: 'A', value: 'improve-skills', label: bi('මැහුම් කුසලතා වැඩිදියුණු කරගන්න', 'Improve my tailoring skills') },
+      { key: 'B', value: 'advanced-techniques', label: bi('විධිමත් ක්‍රමයට සංකීර්ණ මැහුම් ක්‍රම පහසුවෙන් ඉගෙනගන්න', 'Learn advanced tailoring techniques') },
+      { key: 'C', value: 'start-earning', label: bi('මැහුම් කටයුතු වලින් ආදායමක් ලබා ගන්න', 'Start earning through tailoring') },
       { key: 'D', value: 'grow-tailoring-biz', label: bi('දැනට කරගෙන යන මැහුම් කටයුතු හෝ ව්‍යාපාරය දියුණු කරගන්න', 'Grow my existing tailoring or clothing business') },
-      { key: 'E', value: 'grow-business-online', label: bi('ව්‍යාපාරයක් අන්තර්ජාලය (online) හරහා දියුණු කරගන්න හැටි ඉගෙන ගන්න', 'Learn how to grow a business online') },
-      { key: 'F', value: 'understand-tools', label: bi('මගේ ව්‍යාපාරයට අවශ්‍ය ඩිජිටල් මෙවලම් සහ පද්ධති මොනවාද කියලා තේරුම් ගන්න', 'Understand what digital tools/systems my business needs') },
+      { key: 'E', value: 'grow-business-online', label: bi('අවශ්‍ය digital tools/systems භාවිතයෙන් ව්‍යාපාරයක් online හරහා දියුණු කරගන්න හැටි ඉගෙන ගන්න', 'Learn how to grow a business online using the necessary digital tools and systems.') },
     ]
   },
-
-  // ── STEP 3: Technical Branch ─────────────────────────────────────────────
   {
-    id: 'TECH-01', field: 'tailoringSkill', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('තාක්‍ෂණික ශාඛාව', 'Technical Branch'),
-    title: bi('ඔබේ දැනට පවතින මැහුම් කුසලතා මට්ටම කුමක්ද?', 'Current tailoring skill level'),
-    showIf: (a) => isTechnicalBranch(a),
+    id: 'TECH-01', field: 'tailoringSkill', type: 'single-choice', phase: 'step1',
+    stepLabel: bi('කුසලතා මට්ටම', 'Skill Level'),
+    title: bi('දැනට ඔයාගෙ skill level එක කොහොමද?', 'Current tailoring skill level'),
     choices: [
-      { key: 'A', value: 3, label: bi('ආධුනිකයි / දැන් පටන් ගන්නවා', 'Beginner / just starting') },
-      { key: 'B', value: 5, label: bi('මූලික දැනුම තියෙනවා, තව දියුණු කරගන්න ඕනේ', 'Basic knowledge, want to improve') },
-      { key: 'C', value: 8, label: bi('නිතරම මගේ හෝ අනිත් අයට මැහුම් කටයුතු කරනවා', 'I regularly tailor for myself or others') },
-      { key: 'D', value: 10, label: bi('මම වෘත්තීය මැහුම් ශිල්පියෙකු/ශිල්පිනියක් විදිහට වැඩ කරනවා', 'I work professionally as a tailor') },
-      { key: 'E', value: 9, label: bi('හොඳ පළපුරුද්දක් තියෙනවා, විශේෂිත මඟපෙන්වීමක් අවශ්‍යයි', 'Highly experienced, want specialised guidance') },
+      { key: 'A', value: 'beginner', label: bi('තාම මම ආධුනිකයි / දැන් පටන් ගන්නවා', 'Beginner / just starting') },
+      { key: 'B', value: 'job', label: bi('මම මැහුම් ක්ෂේත්‍රයේ රැකියාවක් කරනවා', 'I work in the tailoring field') },
+      { key: 'C', value: 'business', label: bi('මම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් දැනටමත් කරනවා', 'I already run a tailoring-related business') },
+      { key: 'D', value: 'planning-tailoring', label: bi('ලඟදීම මැහුම් ආශ්‍රිත ව්‍යාපාරයක් පටන්ගන්න සැලසුම් කරනවා', 'I\'m planning to start a tailoring-related business soon.') },
+      { key: 'E', value: 'planning-other', label: bi('මැහුම් නොවන වෙනත් ව්‍යාපාරයක් කරන්න බලාපොරොත්තුවෙන් සිටිනවා', 'I\'m hoping to start a different (non-tailoring) business') },
+      { key: 'F', value: 'not-decided', label: bi('තාම තීරණය කරලා නෑ', 'I haven\'t decided yet') },
     ]
-  },
-  {
-    id: 'INT-01', field: 'technicalInterest', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('තාක්‍ෂණික ශාඛාව', 'Technical Branch'),
-    title: bi(
-      'ඔබේ මැහුම් කටයුතු තවදුරටත් දියුණු කරගන්න නිසි මඟපෙන්වීමක් අවශ්‍යද?',
-      'Interested in structured guidance to improve your tailoring?'
-    ),
-    showIf: (a) => isTechnicalBranch(a),
-    choices: [
-      { key: 'A', value: 0, label: bi('දැනට කැමති නැහැ', 'Not currently') },
-      { key: 'B', value: 3, label: bi('සමහරවිට, තවදුරටත් දැනගන්න කැමතියි', 'Maybe, I\'d like to know more') },
-      { key: 'C', value: 7, label: bi('ඔව්, උනන්දුවෙන් ඉන්නවා', 'Yes, I am interested') },
-      { key: 'D', value: 10, label: bi('ඔව්, දැනටමත් සොයමින් ඉන්නවා', 'Yes, I am actively looking for this') },
-    ]
-  },
-  {
-    id: 'TECH-03', field: 'tailoringYears', type: 'short-text', phase: 'step3',
-    stepLabel: bi('තාක්‍ෂණික ශාඛාව', 'Technical Branch'),
-    title: bi('මැහුම් පළපුරුද්ද (වසර)', 'Years of tailoring experience'),
-    placeholder: 'උදා: 3 අවුරුදු / e.g. 3 years',
-    optional: true,
-    showIf: (a) => isTechnicalBranch(a),
-  },
-
-  // ── STEP 3: Business Branch ───────────────────────────────────────────────
-  {
-    id: 'BUS-01', field: 'businessOwnership', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'ඔබ දැනට ව්‍යාපාරයක් කරනවාද, නැත්නම් යම් භාණ්ඩයක් හෝ සේවාවක් (product/service) හරහා ආදායමක්(income) උපයනවාද?',
-      'Do you currently operate a business or earn income through a product/service?'
-    ),
-    showIf: (a) => isBusinessBranch(a),
-    choices: [
-      { key: 'A', value: 0, label: bi('නැහැ', 'No') },
-      { key: 'B', value: 3, label: bi('තාම නැහැ, නමුත් පටන් ගන්න සැලසුම් කරනවා', 'Not yet, but planning to start') },
-      { key: 'C', value: 7, label: bi('ඔව්, කුඩා ව්‍යාපාරයක් හෝ අර්ධකාලීනව කරනවා (small / part-time)', 'Yes, small or part-time') },
-      { key: 'D', value: 10, label: bi('ඔව්, දැනට සක්‍රීයව ව්‍යාපාරය කරගෙන යනවා', 'Yes, actively operating') },
-    ]
-  },
-  {
-    id: 'BUS-02', field: 'businessType', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi('ව්‍යාපාර වර්ගය / ක්‍ෂේත්‍රය?', 'Business type / industry?'),
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-    choices: [
-      { key: 'A', value: 'tailoring', label: bi('මැහුම් / ඇඳුම්', 'Tailoring / Apparel') },
-      { key: 'B', value: 'retail', label: bi('සිල්ලර වෙළඳාම', 'Retail') },
-      { key: 'C', value: 'food', label: bi('ආහාර / බේකරි', 'Food / Bakery') },
-      { key: 'D', value: 'beauty', label: bi('රූපලාවණ්‍ය', 'Beauty / Salon') },
-      { key: 'E', value: 'services', label: bi('සේවා', 'Services') },
-      { key: 'F', value: 'handmade', label: bi('අත්කම්', 'Handmade / Crafts') },
-      { key: 'G', value: 'other-biz-t', label: bi('වෙනත්', 'Other') },
-    ]
-  },
-  {
-    id: 'BUS-03', field: 'businessName', type: 'short-text', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi('ව්‍යාපාරයේ නම', 'Business name'),
-    placeholder: 'ව්‍යාපාරයේ නම / Enter your business name',
-    optional: true,
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-  },
-  {
-    id: 'BUS-04', field: 'businessMaturity', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi('ව්‍යාපාරයේ වර්ධන මට්ටම?', 'Business maturity'),
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-    choices: [
-      { key: 'A', value: 1, label: bi('ව්‍යාපාර අදහසක් (business idea) තියෙන මට්ටමේ', 'Idea stage') },
-      { key: 'B', value: 4, label: bi('පටන් අරගෙන තියෙනවා, නමුත් තවමත් ස්ථාවර නැහැ', 'Started but inconsistent') },
-      { key: 'C', value: 8, label: bi('නිත්‍ය ගනුදෙනුකරුවන් ඉන්නවා, නමුත් වර්ධනය සීමිතයි', 'Regular customers, limited growth') },
-      { key: 'D', value: 10, label: bi('ස්ථාවර ව්‍යාපාරයක්, තවදුරටත් දියුණු කරගන්න බලාපොරොත්තු වෙනවා', 'Stable business seeking growth') },
-      { key: 'E', value: 10.1, label: bi('වර්ධනය වෙමින් පවතින ව්‍යාපාරයක්, නමුත් operational/digital අභියෝග තියෙනවා', 'Growing business with operational/digital challenges') },
-    ]
-  },
-  {
-    id: 'BUS-05', field: 'problems', type: 'multi-select', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'දැනට ඔබ මුහුණ දෙන ප්‍රධාන අභියෝග? (අදාළ සියල්ල තෝරන්න)',
-      'Main current challenges (select all that apply)'
-    ),
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-    choices: [
-      { key: 'A', value: 'more-customers', label: bi('නව ගනුදෙනුකරුවන් හොයාගන්නේ කොහොමද කියලා දන්නේ නැහැ', 'I don\'t know how to get more customers') },
-      { key: 'B', value: 'online-marketing', label: bi('ව්‍යාපාරය online හරහා ප්‍රවර්ධනය කරන්නේ කොහොමද කියලා දන්නේ නැහැ', 'I don\'t know how to market my business online') },
-      { key: 'C', value: 'content-creation', label: bi('මොනවා post කරන්නද, content creation කරන්නේ කොහොමද කියලා දන්නේ නැහැ', 'I don\'t know what to post or how to create content') },
-      { key: 'D', value: 'online-sales', label: bi('online හරහා විකිණීම් සිදු කරන පැහැදිලි ක්‍රමයක් නැහැ', 'I don\'t have a clear online sales process') },
-      { key: 'E', value: 'website-system', label: bi('මට website එකක් හෝ digital system එකක් අවශ්‍යයි', 'I need a website or digital system') },
-      { key: 'F', value: 'too-many-ops', label: bi('දිනපතා අතින් කරන්න වෙන වැඩ ගොඩක් තියෙනවා', 'I have too many operational/manual tasks') },
-      { key: 'G', value: 'unsure-problem', label: bi('මගේ ලොකුම ගැටලුව මොකක්ද කියලා හරියටම තේරෙන්නේ නැහැ', 'I\'m unsure what my biggest problem is') },
-    ]
-  },
-  {
-    id: 'BUS-06', field: 'digitalPresence', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi('දැනට ඔබේ ව්‍යාපාරය අන්තර්ජාලයේ (online) පවතින ආකාරය?', 'Current digital presence'),
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-    choices: [
-      { key: 'A', value: 'none', label: bi('අන්තර්ජාලය තුළ කිසිදු පැවැත්මක් නැහැ', 'No online presence') },
-      { key: 'B', value: 'personal-fb', label: bi('පුද්ගලික Facebook / Instagram / WhatsApp පමණයි', 'Personal Facebook / Instagram / WhatsApp only') },
-      { key: 'C', value: 'biz-fb', label: bi('ව්‍යාපාරික Facebook / Instagram page තියෙනවා', 'Business Facebook / Instagram page') },
-      { key: 'D', value: 'biz-plus-wa', label: bi('ව්‍යාපාරික Facebook / Instagram Page සහ Business WhatsApp තියෙනවා', 'Business Facebook / Instagram page + Business WhatsApp') },
-      { key: 'E', value: 'multi-social', label: bi('සමාජ මාධ්‍ය (Social Channels) කිහිපයක් භාවිතා කරනවා', 'Multiple Social channels') },
-      { key: 'F', value: 'full-online', label: bi('සමාජ මාධ්‍ය (Social Channels) සමඟ වෙබ් අඩවියක් (Website) හෝ ක්‍රමවත් අන්තර්ජාල විකිණීම් ක්‍රමයක් (Structured Online Sales) තියෙනවා', 'Social channels + website or structured online sales') },
-    ]
-  },
-  {
-    id: 'BUS-07', field: 'salesChannels', type: 'multi-select', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'දැනට ඔබට ගනුදෙනුකරුවන් ලැබෙන්නේ කුමන මාර්ගවලින්ද?',
-      'Current sales channels'
-    ),
-    showIf: (a) => isBusinessBranch(a) && (a.businessOwnership || 0) > 3,
-    choices: [
-      { key: 'A', value: 'walk-in', label: bi('වෙළඳසැලට / ස්ථානයට පැමිණෙන ගනුදෙනුකරුවන්', 'Walk-in / local customers') },
-      { key: 'B', value: 'facebook', label: bi('Facebook හරහා', 'Facebook') },
-      { key: 'C', value: 'whatsapp', label: bi('WhatsApp හරහා', 'WhatsApp') },
-      { key: 'D', value: 'instagram', label: bi('Instagram හරහා', 'Instagram') },
-      { key: 'E', value: 'tiktok', label: bi('TikTok හරහා', 'TikTok') },
-      { key: 'F', value: 'website', label: bi('Website / Online Store හරහා', 'Website / online store') },
-      { key: 'G', value: 'marketplace', label: bi('Online Marketplace හරහා', 'Marketplace') },
-      { key: 'H', value: 'referrals', label: bi('හඳුනන අයගේ නිර්දේශ / කටින් කට', 'Referrals / word-of-mouth') },
-      { key: 'I', value: 'other', label: bi('වෙනත්', 'Other') },
-    ]
-  },
-
-  // ── Shared Intent: Business ──────────────────────────────────────────────
-  {
-    id: 'INT-02', field: 'diyPreference', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'පැහැදිලිව, පියවරෙන් පියවර මඟපෙන්වීමක් ලැබුණොත්, ඔබටම ඒක ක්‍රියාත්මක කරගෙන යන්න පුළුවන්ද?',
-      'If you received a clear step-by-step plan, would you be comfortable implementing it yourself?'
-    ),
-    showIf: (a) => isBusinessBranch(a),
-    choices: [
-      { key: 'A', value: 0, label: bi('නැහැ, මට කෙනෙක් මඟපෙන්වලා දෙන්න ඕනේ', 'No, I need someone to guide me') },
-      { key: 'B', value: 4, label: bi('සමහරවිට, වැඩේ අමාරුකම අනුව', 'Maybe, depending on the difficulty') },
-      { key: 'C', value: 8, label: bi('ඔව්, පැහැදිලි මඟපෙන්වීමක් සහ templates තියෙනවා නම්', 'Yes, with a clear guide and templates') },
-      { key: 'D', value: 10, label: bi('ඔව්, මමම ඉගෙනගෙන මමම ක්‍රියාත්මක කරගෙන යන්න කැමතියි', 'Yes, I prefer learning and implementing myself') },
-    ]
-  },
-  {
-    id: 'INT-03', field: 'mentorshipInterest', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'ඔබේ ව්‍යාපාරය දියුණු කරගන්න පියවරෙන් පියවර මඟපෙන්වීමක් ලබාගැනීමට ඔබ කැමතිද?',
-      'Would you be interested in structured guidance to grow your business?'
-    ),
-    showIf: (a) => isBusinessBranch(a),
-    choices: [
-      { key: 'A', value: 0, label: bi('නැහැ', 'No') },
-      { key: 'B', value: 3, label: bi('සමහරවිට', 'Maybe') },
-      { key: 'C', value: 7, label: bi('ඔව්, ඒක කොහොමද වෙන්නේ කියලා දැනගන්න කැමතියි', 'Yes, I\'d like to understand how it works') },
-      { key: 'D', value: 10, label: bi('ඔව්, දැන් මට මඟපෙන්වීමක් ඕනේ', 'Yes, I am looking for guidance now') },
-    ]
-  },
-  {
-    id: 'INT-04', field: 'dfyRequirement', type: 'single-choice', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'ඔබේ ව්‍යාපාරයට අවශ්‍ය දෙයක් හදාගන්න හෝ ක්‍රියාත්මක කරගන්න වෘත්තිකයෙකුගේ හෝ කණ්ඩායමකගේ උදව් අවශ්‍යද?',
-      'Do you currently need a professional or team to build or implement something for your business?'
-    ),
-    showIf: (a) => isBusinessBranch(a),
-    choices: [
-      { key: 'A', value: 0, label: bi('නැහැ', 'No') },
-      { key: 'B', value: 2, label: bi('හරියටම දන්නේ නැහැ', 'Not sure') },
-      { key: 'C', value: 5, label: bi('සමහරවිට, solution සහ cost අනුව', 'Possibly, depending on the solution and cost') },
-      { key: 'D', value: 10, label: bi('ඔව්, මට දැනටමත් කරන්න ඕනේ දේ පැහැදිලිව තියෙනවා', 'Yes, I have a specific requirement') },
-    ]
-  },
-  {
-    id: 'INT-05', field: 'dfyNeeds', type: 'multi-select', phase: 'step3',
-    stepLabel: bi('ව්‍යාපාර ශාඛාව', 'Business Branch'),
-    title: bi(
-      'ඔබේ ව්‍යාපාරයට අවශ්‍ය දෙයක් ක්‍රියාත්මක කරගන්න ඔබට උදව් අවශ්‍ය මොනවටද? (අදාළ සියල්ල තෝරන්න)',
-      'What do you need help implementing?'
-    ),
-    showIf: (a) => isBusinessBranch(a) && (a.dfyRequirement || 0) >= 5,
-    choices: [
-      { key: 'A', value: 'website', label: bi('වෙබ් අඩවියක් (Website)', 'Website') },
-      { key: 'B', value: 'online-store', label: bi('අන්තර්ජාල වෙළඳසැලක් (Online Store)', 'Online Store') },
-      { key: 'C', value: 'sales-funnel', label: bi('ගනුදෙනුකරුවන් සොයාගැනීම / විකිණීම් වැඩි කරගැනීමේ ක්‍රමයක්', 'Sales Funnel / Lead Generation') },
-      { key: 'D', value: 'social-media', label: bi('සමාජ මාධ්‍ය කළමනාකරණ ක්‍රමයක්', 'Social Media System') },
-      { key: 'E', value: 'automation', label: bi('ස්වයංක්‍රීය කරගැනීම් (Automation)', 'Automation') },
-      { key: 'F', value: 'crm', label: bi('ගනුදෙනුකරුවන් කළමනාකරණය කිරීමේ පද්ධතියක් (CRM)', 'CRM / Customer Management') },
-      { key: 'G', value: 'content', label: bi('අන්තර්ගත නිර්මාණය සහ පළ කිරීමේ ක්‍රමයක්', 'Content System') },
-      { key: 'H', value: 'other', label: bi('වෙනත්', 'Other') },
-    ]
-  },
-
-  // ── Closing (both branches) ───────────────────────────────────────────────
-  {
-    id: 'CLOSING', field: 'closingNote', type: 'short-text', phase: 'step3',
-    stepLabel: bi('අවසාන ප්‍රශ්නය', 'Final Question'),
-    title: bi(
-      'ඔබේ අරමුණ හෝ ඔබ මුහුණ දෙන අභියෝගය ගැන අපි දැනගත යුතු තවත් දෙයක් තියෙනවාද?',
-      'Anything else about your goal or challenge you\'d like us to know?'
-    ),
-    placeholder: 'ලිවිය හැකි නම් ලියන්න... / Anything else? - optional',
-    optional: true,
-  },
+  }
 ];
-
-// ── Branch helpers ────────────────────────────────────────────────────────────
-function isTechnicalBranch(a) {
-  const techSit = ['learning', 'job', 'tailoring-biz'].includes(a.currentSituation);
-  let techGoal = false;
-  if (Array.isArray(a.primaryGoal)) {
-    techGoal = a.primaryGoal.some(g => ['improve-skills', 'advanced-techniques', 'start-earning', 'grow-tailoring-biz'].includes(g));
-  } else {
-    techGoal = ['improve-skills', 'advanced-techniques', 'start-earning', 'grow-tailoring-biz'].includes(a.primaryGoal);
-  }
-  return techSit || techGoal;
-}
-function isBusinessBranch(a) {
-  const bizSit = ['tailoring-biz', 'other-biz', 'planning'].includes(a.currentSituation);
-  let bizGoal = false;
-  if (Array.isArray(a.primaryGoal)) {
-    bizGoal = a.primaryGoal.some(g => ['grow-tailoring-biz', 'grow-business-online', 'understand-tools', 'start-earning'].includes(g));
-  } else {
-    bizGoal = ['grow-tailoring-biz', 'grow-business-online', 'understand-tools', 'start-earning'].includes(a.primaryGoal);
-  }
-  return bizSit || bizGoal;
-}
-
-// ── Score calculation ─────────────────────────────────────────────────────────
-const PROBLEM_WEIGHTS = {
-  'more-customers': { business: 3, diy: 2, dfy: 1 },
-  'online-marketing': { business: 3, diy: 3, dfy: 1 },
-  'content-creation': { business: 2, diy: 3, dfy: 1 },
-  'online-sales': { business: 3, diy: 2, dfy: 3 },
-  'website-system': { business: 2, diy: 0, dfy: 5 },
-  'too-many-ops': { business: 3, diy: 1, dfy: 5 },
-  'unsure-problem': { business: 2, diy: 3, dfy: 0 },
-};
-const DIGITAL_GAP = { 'none': 10, 'personal-fb': 8, 'biz-fb': 5, 'biz-plus-wa': 4, 'multi-social': 3, 'full-online': 0 };
-
-function calculateScores(answers) {
-  // Technical
-  const technical = Math.min(30, (answers.tailoringSkill || 0) + (answers.technicalInterest || 0));
-
-  // Business
-  const problemBiz = (answers.problems || []).reduce((s, p) => s + (PROBLEM_WEIGHTS[p]?.business || 0), 0);
-  const business = Math.min(35, (answers.businessOwnership || 0) + (answers.businessMaturity || 0) + Math.min(10, problemBiz));
-
-  // DIY
-  const bm = answers.businessMaturity || 0;
-  const earlyBizStage = bm <= 1 ? 10 : bm <= 4 ? 8 : bm <= 7 ? 5 : 2;
-  const problemDiy = (answers.problems || []).reduce((s, p) => s + (PROBLEM_WEIGHTS[p]?.diy || 0), 0);
-  const digitalGap = DIGITAL_GAP[answers.digitalPresence] || 5;
-  const diy = Math.min(30, (answers.diyPreference || 0) + Math.min(10, problemDiy + digitalGap) + earlyBizStage);
-
-  // DFY
-  const problemDfy = (answers.problems || []).reduce((s, p) => s + (PROBLEM_WEIGHTS[p]?.dfy || 0), 0);
-  const dfyReq = answers.dfyRequirement || 0;
-  const dfy = Math.min(35, dfyReq + Math.min(10, problemDfy) + (dfyReq >= 10 ? 10 : dfyReq >= 5 ? 5 : 0));
-
-  let routes = [];
-  if (dfy >= 18) routes.push({ route: 'DFY_CONSULTATION', score: dfy });
-  if (business >= 18 && (answers.mentorshipInterest || 0) >= 7) routes.push({ route: 'BUSINESS_GROWTH_MENTORSHIP', score: business });
-  if (technical >= 18 && (answers.technicalInterest || 0) >= 7) routes.push({ route: 'TECHNICAL_TAILORING', score: technical });
-  if (business >= 10 && diy >= 18 && dfy < 18) routes.push({ route: 'DIY_BUSINESS_GROWTH', score: diy });
-
-  routes.sort((a, b) => b.score - a.score);
-  const primary = routes.length > 0 ? routes[0].route : 'NURTURE';
-  return { technical, business, diy, dfy, primary };
-}
-
-const ROUTE_LABELS = {
-  TECHNICAL_TAILORING: 'Technical Tailoring Mentorship',
-  DIY_BUSINESS_GROWTH: 'DIY Business Growth',
-  BUSINESS_GROWTH_MENTORSHIP: 'Business Growth Mentorship',
-  DFY_CONSULTATION: 'Done-For-You Consultation',
-  NURTURE: 'Workshop Participant',
-};
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let state = {
@@ -384,7 +122,25 @@ window.Funnel = {
     const contentArea = document.getElementById('quiz-content-area');
     const navBar = document.getElementById('quiz-nav');
     const nextNavBtn = document.getElementById('btn-next-nav');
-    if (nextNavBtn) nextNavBtn.style.display = 'none';
+    
+    // Check if it's the last question to change the "Next" button to "Submit"
+    let nextBtnText = "ඉදිරියට / Next";
+    let isLastQ = (state.qIndex === activeQ.length - 1);
+    if (isLastQ) {
+      nextBtnText = "Submit";
+    }
+
+    if (nextNavBtn) {
+      nextNavBtn.style.display = 'none';
+      nextNavBtn.innerHTML = nextBtnText;
+      if (isLastQ) {
+        nextNavBtn.style.background = '#000';
+        nextNavBtn.style.color = '#fff';
+      } else {
+        nextNavBtn.style.background = '';
+        nextNavBtn.style.color = '';
+      }
+    }
 
     const isSameQ = state.lastRenderedQ === currentQ.id;
     state.lastRenderedQ = currentQ.id;
@@ -396,9 +152,6 @@ window.Funnel = {
 
     contentArea.innerHTML = '';
 
-    // ── Diagnostic / Assessment Phase Logic ──────────────────────────────
-    // The registration form is natively embedded on the page now.
-    
     if (currentQ.type === 'single-choice') {
       navBar.style.display = 'flex';
       const hasAnswer = state.answers[currentQ.field] !== undefined;
@@ -423,11 +176,8 @@ window.Funnel = {
       html += `</div></div>`;
       contentArea.innerHTML = html;
     }
-
-    // ── Multi-select ──────────────────────────────────────────────────────
     else if (currentQ.type === 'multi-select') {
       navBar.style.display = 'flex';
-      // Restore prior selections
       if (!state.multiVals.length && state.answers[currentQ.field]) {
         state.multiVals = [...state.answers[currentQ.field]];
       }
@@ -448,48 +198,326 @@ window.Funnel = {
       });
       html += `</div>
         <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
-          ${state.multiVals.length === 0 ? 'disabled' : ''}>
-          OK
+          ${state.multiVals.length === 0 ? 'disabled' : ''} style="${isLastQ ? 'background:#000;color:#fff;' : ''}">
+          ${isLastQ ? 'Submit' : 'OK'}
         </button>
       </div>`;
       contentArea.innerHTML = html;
     }
+    else if (currentQ.type === 'country-select' || currentQ.type === 'district-select') {
+      navBar.style.display = 'flex';
+      const existing = state.answers[currentQ.field] || '';
+      const hasSelection = existing.trim().length > 0;
+      
+      let optionsHtml = '';
+      if (currentQ.type === 'country-select') {
+        optionsHtml = `
+          <option value="" disabled selected>රට තෝරන්න / Select Country</option>
+          <option value="Sri Lanka">ශ්‍රී ලංකාව / Sri Lanka</option>
+          <option value="Afghanistan">ඇෆ්ගනිස්ථානය / Afghanistan</option>
+          <option value="Albania">ඇල්බේනියාව / Albania</option>
+          <option value="Algeria">ඇල්ජීරියාව / Algeria</option>
+          <option value="Andorra">ඇන්ඩෝරාව / Andorra</option>
+          <option value="Angola">ඇන්ගෝලාව / Angola</option>
+          <option value="Antigua and Barbuda">ඇන්ටිගුවා සහ බාබියුඩා / Antigua and Barbuda</option>
+          <option value="Argentina">ආර්ජන්ටිනාව / Argentina</option>
+          <option value="Armenia">ආර්මේනියාව / Armenia</option>
+          <option value="Australia">ඕස්ට්‍රේලියාව / Australia</option>
+          <option value="Austria">ඔස්ට්‍රියාව / Austria</option>
+          <option value="Azerbaijan">අසර්බයිජානය / Azerbaijan</option>
+          <option value="Bahamas">බහමාස් / Bahamas</option>
+          <option value="Bahrain">බහරේන් / Bahrain</option>
+          <option value="Bangladesh">බංග්ලාදේශය / Bangladesh</option>
+          <option value="Barbados">බාබඩෝස් / Barbados</option>
+          <option value="Belarus">බෙලරුස් / Belarus</option>
+          <option value="Belgium">බෙල්ජියම / Belgium</option>
+          <option value="Belize">බෙලීස් / Belize</option>
+          <option value="Benin">බෙනින් / Benin</option>
+          <option value="Bhutan">භූතානය / Bhutan</option>
+          <option value="Bolivia">බොලිවියාව / Bolivia</option>
+          <option value="Bosnia and Herzegovina">බොස්නියාව සහ හර්සගොවිනාව / Bosnia and Herzegovina</option>
+          <option value="Botswana">බොට්ස්වානා / Botswana</option>
+          <option value="Brazil">බ්‍රසීලය / Brazil</option>
+          <option value="Brunei">බෲනායි / Brunei</option>
+          <option value="Bulgaria">බල්ගේරියාව / Bulgaria</option>
+          <option value="Burkina Faso">බුර්කිනා ෆාසෝ / Burkina Faso</option>
+          <option value="Burundi">බුරුන්ඩි / Burundi</option>
+          <option value="Cabo Verde">කේප් වර්ඩ් / Cabo Verde</option>
+          <option value="Cambodia">කාම්බෝජය / Cambodia</option>
+          <option value="Cameroon">කැමරූන් / Cameroon</option>
+          <option value="Canada">කැනඩාව / Canada</option>
+          <option value="Central African Republic">මධ්‍යම අප්‍රිකානු ජනරජය / Central African Republic</option>
+          <option value="Chad">චැඩ් / Chad</option>
+          <option value="Chile">චිලී / Chile</option>
+          <option value="China">චීනය / China</option>
+          <option value="Colombia">කොලොම්බියාව / Colombia</option>
+          <option value="Comoros">කොමරෝස් / Comoros</option>
+          <option value="Congo (Congo-Brazzaville)">කොංගෝව / Congo (Congo-Brazzaville)</option>
+          <option value="Costa Rica">කොස්ටාරිකා / Costa Rica</option>
+          <option value="Croatia">ක්‍රොඒෂියාව / Croatia</option>
+          <option value="Cuba">කියුබාව / Cuba</option>
+          <option value="Cyprus">සයිප්‍රසය / Cyprus</option>
+          <option value="Czechia (Czech Republic)">චෙක් ජනරජය / Czechia</option>
+          <option value="Democratic Republic of the Congo">කොංගෝ ප්‍රජාතන්ත්‍රවාදී ජනරජය / DR Congo</option>
+          <option value="Denmark">ඩෙන්මාර්කය / Denmark</option>
+          <option value="Djibouti">ජිබුටි / Djibouti</option>
+          <option value="Dominica">ඩොමිනිකා / Dominica</option>
+          <option value="Dominican Republic">ඩොමිනිකන් ජනරජය / Dominican Republic</option>
+          <option value="Ecuador">ඉක්වදෝරය / Ecuador</option>
+          <option value="Egypt">ඊජිප්තුව / Egypt</option>
+          <option value="El Salvador">එල් සැල්වදෝරය / El Salvador</option>
+          <option value="Equatorial Guinea">සමක ගිනියාව / Equatorial Guinea</option>
+          <option value="Eritrea">එරිත්‍රියාව / Eritrea</option>
+          <option value="Estonia">එස්තෝනියාව / Estonia</option>
+          <option value="Eswatini (fmr. Swaziland)">එස්වාටිනි / Eswatini</option>
+          <option value="Ethiopia">ඉතියෝපියාව / Ethiopia</option>
+          <option value="Fiji">ෆීජි / Fiji</option>
+          <option value="Finland">ෆින්ලන්තය / Finland</option>
+          <option value="France">ප්‍රංශය / France</option>
+          <option value="Gabon">ගැබොන් / Gabon</option>
+          <option value="Gambia">ගැම්බියාව / Gambia</option>
+          <option value="Georgia">ජෝර්ජියාව / Georgia</option>
+          <option value="Germany">ජර්මනිය / Germany</option>
+          <option value="Ghana">ඝානාව / Ghana</option>
+          <option value="Greece">ග්‍රීසිය / Greece</option>
+          <option value="Grenada">ග්‍රෙනේඩා / Grenada</option>
+          <option value="Guatemala">ග්වාතමාලාව / Guatemala</option>
+          <option value="Guinea">ගිනියාව / Guinea</option>
+          <option value="Guinea-Bissau">ගිනියා-බිසව් / Guinea-Bissau</option>
+          <option value="Guyana">ගයනාව / Guyana</option>
+          <option value="Haiti">හයිටි / Haiti</option>
+          <option value="Honduras">හොන්ඩුරාස් / Honduras</option>
+          <option value="Hungary">හංගේරියාව / Hungary</option>
+          <option value="Iceland">අයිස්ලන්තය / Iceland</option>
+          <option value="India">ඉන්දියාව / India</option>
+          <option value="Indonesia">ඉන්දුනීසියාව / Indonesia</option>
+          <option value="Iran">ඉරානය / Iran</option>
+          <option value="Iraq">ඉරාකය / Iraq</option>
+          <option value="Ireland">අයර්ලන්තය / Ireland</option>
+          <option value="Israel">ඊශ්‍රායලය / Israel</option>
+          <option value="Italy">ඉතාලිය / Italy</option>
+          <option value="Jamaica">ජැමෙයිකාව / Jamaica</option>
+          <option value="Japan">ජපානය / Japan</option>
+          <option value="Jordan">ජෝර්දානය / Jordan</option>
+          <option value="Kazakhstan">කසකස්ථානය / Kazakhstan</option>
+          <option value="Kenya">කෙන්යාව / Kenya</option>
+          <option value="Kiribati">කිරිබතී / Kiribati</option>
+          <option value="Kuwait">කුවේටය / Kuwait</option>
+          <option value="Kyrgyzstan">කිර්ගිස්ථානය / Kyrgyzstan</option>
+          <option value="Laos">ලාඕසය / Laos</option>
+          <option value="Latvia">ලැට්වියාව / Latvia</option>
+          <option value="Lebanon">ලෙබනනය / Lebanon</option>
+          <option value="Lesotho">ලෙසෝතෝ / Lesotho</option>
+          <option value="Liberia">ලයිබීරියාව / Liberia</option>
+          <option value="Libya">ලිබියාව / Libya</option>
+          <option value="Liechtenstein">ලික්ටෙන්ස්ටයින් / Liechtenstein</option>
+          <option value="Lithuania">ලිතුවේනියාව / Lithuania</option>
+          <option value="Luxembourg">ලක්සම්බර්ග් / Luxembourg</option>
+          <option value="Madagascar">මැඩගස්කරය / Madagascar</option>
+          <option value="Malawi">මලාවි / Malawi</option>
+          <option value="Malaysia">මැලේසියාව / Malaysia</option>
+          <option value="Maldives">මාලදිවයින / Maldives</option>
+          <option value="Mali">මාලි / Mali</option>
+          <option value="Malta">මෝල්ටාව / Malta</option>
+          <option value="Marshall Islands">මාෂල් දූපත් / Marshall Islands</option>
+          <option value="Mauritania">මොරිටේනියාව / Mauritania</option>
+          <option value="Mauritius">මුරුසිය / Mauritius</option>
+          <option value="Mexico">මෙක්සිකෝව / Mexico</option>
+          <option value="Micronesia">මයික්‍රොනීසියාව / Micronesia</option>
+          <option value="Moldova">මෝල්ඩෝවා / Moldova</option>
+          <option value="Monaco">මොනාකෝ / Monaco</option>
+          <option value="Mongolia">මොංගෝලියාව / Mongolia</option>
+          <option value="Montenegro">මොන්ටිනිග්‍රෝ / Montenegro</option>
+          <option value="Morocco">මොරොක්කෝව / Morocco</option>
+          <option value="Mozambique">මොසැම්බික් / Mozambique</option>
+          <option value="Myanmar (formerly Burma)">මියන්මාරය / Myanmar</option>
+          <option value="Namibia">නැමීබියාව / Namibia</option>
+          <option value="Nauru">නාඌරූ / Nauru</option>
+          <option value="Nepal">නේපාලය / Nepal</option>
+          <option value="Netherlands">නෙදර්ලන්තය / Netherlands</option>
+          <option value="New Zealand">නවසීලන්තය / New Zealand</option>
+          <option value="Nicaragua">නිකරගුවාව / Nicaragua</option>
+          <option value="Niger">නයිජර් / Niger</option>
+          <option value="Nigeria">නයිජීරියාව / Nigeria</option>
+          <option value="North Korea">උතුරු කොරියාව / North Korea</option>
+          <option value="North Macedonia">උතුරු මැසිඩෝනියාව / North Macedonia</option>
+          <option value="Norway">නෝර්වේ / Norway</option>
+          <option value="Oman">ඕමානය / Oman</option>
+          <option value="Pakistan">පාකිස්ථානය / Pakistan</option>
+          <option value="Palau">පලාවු / Palau</option>
+          <option value="Palestine State">පලස්තීනය / Palestine State</option>
+          <option value="Panama">පැනමාව / Panama</option>
+          <option value="Papua New Guinea">පැපුවා නිව්ගිනියාව / Papua New Guinea</option>
+          <option value="Paraguay">පැරගුවේ / Paraguay</option>
+          <option value="Peru">පේරු / Peru</option>
+          <option value="Philippines">පිලිපීනය / Philippines</option>
+          <option value="Poland">පෝලන්තය / Poland</option>
+          <option value="Portugal">පෘතුගාලය / Portugal</option>
+          <option value="Qatar">කටාර් / Qatar</option>
+          <option value="Romania">රුමේනියාව / Romania</option>
+          <option value="Russia">රුසියාව / Russia</option>
+          <option value="Rwanda">රුවන්ඩාව / Rwanda</option>
+          <option value="Saint Kitts and Nevis">ශාන්ත කිට්ස් සහ නේවිස් / Saint Kitts and Nevis</option>
+          <option value="Saint Lucia">ශාන්ත ලුසියා / Saint Lucia</option>
+          <option value="Saint Vincent and the Grenadines">ශාන්ත වින්සන්ට් සහ ග්‍රෙනඩින්ස් / St. Vincent & Grenadines</option>
+          <option value="Samoa">සැමෝවා / Samoa</option>
+          <option value="San Marino">සැන් මරිනෝ / San Marino</option>
+          <option value="Sao Tome and Principe">සාඕ ටෝම් සහ ප්‍රින්සිපේ / Sao Tome and Principe</option>
+          <option value="Saudi Arabia">සෞදි අරාබිය / Saudi Arabia</option>
+          <option value="Senegal">සෙනගල් / Senegal</option>
+          <option value="Serbia">සර්බියාව / Serbia</option>
+          <option value="Seychelles">සීෂෙල්ස් / Seychelles</option>
+          <option value="Sierra Leone">සියෙරා ලියොන් / Sierra Leone</option>
+          <option value="Singapore">සිංගප්පූරුව / Singapore</option>
+          <option value="Slovakia">ස්ලෝවැකියාව / Slovakia</option>
+          <option value="Slovenia">ස්ලෝවේනියාව / Slovenia</option>
+          <option value="Solomon Islands">සොලමන් දූපත් / Solomon Islands</option>
+          <option value="Somalia">සෝමාලියාව / Somalia</option>
+          <option value="South Africa">දකුණු අප්‍රිකාව / South Africa</option>
+          <option value="South Korea">දකුණු කොරියාව / South Korea</option>
+          <option value="South Sudan">දකුණු සුඩානය / South Sudan</option>
+          <option value="Spain">ස්පාඤ්ඤය / Spain</option>
+          <option value="Sudan">සුඩානය / Sudan</option>
+          <option value="Suriname">සුරිනාමය / Suriname</option>
+          <option value="Sweden">ස්වීඩනය / Sweden</option>
+          <option value="Switzerland">ස්විට්සර්ලන්තය / Switzerland</option>
+          <option value="Syria">සිරියාව / Syria</option>
+          <option value="Tajikistan">තජිකිස්ථානය / Tajikistan</option>
+          <option value="Tanzania">ටැන්සානියාව / Tanzania</option>
+          <option value="Thailand">තායිලන්තය / Thailand</option>
+          <option value="Timor-Leste">ටිමෝර්-ලෙස්ටේ / Timor-Leste</option>
+          <option value="Togo">ටෝගෝ / Togo</option>
+          <option value="Tonga">ටොංගා / Tonga</option>
+          <option value="Trinidad and Tobago">ට්‍රිනිඩෑඩ් සහ ටොබැගෝ / Trinidad and Tobago</option>
+          <option value="Tunisia">ටියුනීසියාව / Tunisia</option>
+          <option value="Turkey">තුර්කිය / Turkey</option>
+          <option value="Turkmenistan">ටර්ක්මෙනිස්තානය / Turkmenistan</option>
+          <option value="Tuvalu">ටුවාලු / Tuvalu</option>
+          <option value="Uganda">උගන්ඩාව / Uganda</option>
+          <option value="Ukraine">යුක්රේනය / Ukraine</option>
+          <option value="United Arab Emirates">එක්සත් අරාබි එමීර් රාජ්‍යය / United Arab Emirates</option>
+          <option value="United Kingdom">එක්සත් රාජධානිය / United Kingdom</option>
+          <option value="United States of America">ඇමරිකා එක්සත් ජනපදය / United States</option>
+          <option value="Uruguay">උරුගුවේ / Uruguay</option>
+          <option value="Uzbekistan">උස්බෙකිස්ථානය / Uzbekistan</option>
+          <option value="Vanuatu">වනුවාටු / Vanuatu</option>
+          <option value="Venezuela">වෙනිසියුලාව / Venezuela</option>
+          <option value="Vietnam">වියට්නාමය / Vietnam</option>
+          <option value="Yemen">යේමනය / Yemen</option>
+          <option value="Zambia">සැම්බියාව / Zambia</option>
+          <option value="Zimbabwe">සිම්බාබ්වේ / Zimbabwe</option>
+        `;
+      } else {
+        optionsHtml = `
+          <option value="" disabled selected>දිස්ත්‍රික්කය තෝරන්න / Select District</option>
+          <option value="Ampara">අම්පාර / Ampara</option>
+          <option value="Anuradhapura">අනුරාධපුර / Anuradhapura</option>
+          <option value="Badulla">බදුල්ල / Badulla</option>
+          <option value="Batticaloa">මඩකලපුව / Batticaloa</option>
+          <option value="Colombo">කොළඹ / Colombo</option>
+          <option value="Galle">ගාල්ල / Galle</option>
+          <option value="Gampaha">ගම්පහ / Gampaha</option>
+          <option value="Hambantota">හම්බන්තොට / Hambantota</option>
+          <option value="Jaffna">යාපනය / Jaffna</option>
+          <option value="Kalutara">කළුතර / Kalutara</option>
+          <option value="Kandy">මහනුවර / Kandy</option>
+          <option value="Kegalle">කෑගල්ල / Kegalle</option>
+          <option value="Kilinochchi">කිලිනොච්චි / Kilinochchi</option>
+          <option value="Kurunegala">කුරුණෑගල / Kurunegala</option>
+          <option value="Mannar">මන්නාරම / Mannar</option>
+          <option value="Matale">මාතලේ / Matale</option>
+          <option value="Matara">මාතර / Matara</option>
+          <option value="Moneragala">මොණරාගල / Moneragala</option>
+          <option value="Mullaitivu">මුලතිව් / Mullaitivu</option>
+          <option value="Nuwara Eliya">නුවරඑළිය / Nuwara Eliya</option>
+          <option value="Polonnaruwa">පොළොන්නරුව / Polonnaruwa</option>
+          <option value="Puttalam">පුත්තලම / Puttalam</option>
+          <option value="Ratnapura">රත්නපුර / Ratnapura</option>
+          <option value="Trincomalee">ත්‍රිකුණාමලය / Trincomalee</option>
+          <option value="Vavuniya">වවුනියාව / Vavuniya</option>
+        `;
+      }
 
-    // ── Short-text ────────────────────────────────────────────────────────
+      const optionMatches = [...optionsHtml.matchAll(/<option value="([^"]*)"(?:[^>]*)>(.*?)<\/option>/g)];
+      let customOptionsHtml = optionMatches.map(m => {
+        if (m[1] === '') return ''; // skip the disabled placeholder
+        return `<div class="custom-select-option" onclick="window.Funnel.saveText('${currentQ.field}', '${m[1]}'); document.getElementById('custom-select-trigger').innerHTML='${m[2]}'; document.getElementById('custom-select-modal').style.display='none'; document.getElementById('select-ok').style.display='inline-flex';">${m[2]}</div>`;
+      }).join('');
+      
+      let triggerText = 'තෝරන්න / Select...';
+      if (existing) {
+        const selectedMatch = optionMatches.find(m => m[1] === existing);
+        if (selectedMatch) triggerText = selectedMatch[2];
+      }
+      
+      // Simple text version of title for the modal header
+      const headerTitle = currentQ.type === 'country-select' ? 'රට තෝරන්න / Select Country' : 'දිස්ත්‍රික්කය තෝරන්න / Select District';
+      
+      const globalContainer = document.getElementById('global-select-container');
+      if (globalContainer) {
+        globalContainer.innerHTML = `
+          <div id="custom-select-modal" class="custom-select-modal" style="display:none;">
+            <div class="custom-select-dialog">
+              <div class="custom-select-header">
+                <span>${headerTitle}</span>
+                <button type="button" class="quiz-close-btn" onclick="document.getElementById('custom-select-modal').style.display='none'; event.stopPropagation();" style="position:static; margin:0; width:32px; height:32px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div class="custom-select-body">
+                ${customOptionsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      contentArea.innerHTML = `
+        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}" style="text-align: center;">
+          <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
+            ${currentQ.title}
+          </div>
+          ${currentQ.optional ? '<p class="quiz-optional-note">අත්‍යාවශ්‍ය නොවේ &mdash; Optional</p>' : ''}
+          <div class="input-wrap" style="position:relative; margin-top: 0.5rem; text-align:left;">
+            <div id="custom-select-trigger" class="quiz-text-input custom-select-trigger" onclick="document.getElementById('custom-select-modal').style.display = 'flex';">
+              ${triggerText}
+            </div>
+          </div>
+          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
+            <button class="quiz-ok-btn" id="select-ok" onclick="window.Funnel.goNext()" style="${hasSelection ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
+          </div>
+        </div>
+      `;
+      
+      if (existing) {
+        setTimeout(() => {
+          const selectEl = contentArea.querySelector('select');
+          if (selectEl) selectEl.value = existing;
+        }, 10);
+      }
+    }
     else if (currentQ.type === 'short-text') {
       navBar.style.display = 'flex';
       const existing = state.answers[currentQ.field] || '';
       const hasText = existing.trim().length > 0;
 
       contentArea.innerHTML = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}">
-          <h2 class="quiz-q-title">${currentQ.title}</h2>
+        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}" style="text-align: center;">
+          <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
+            ${currentQ.title}
+          </div>
           ${currentQ.optional ? '<p class="quiz-optional-note">අත්‍යාවශ්‍ය නොවේ &mdash; Optional</p>' : ''}
-          <input type="text" class="quiz-text-input" id="short-text-input"
+          <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
             placeholder="${currentQ.placeholder || ''}"
             value="${existing}"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)">
-          <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
             <button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>
-            <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}">ඉදිරියට / Next</button>
+            <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
           </div>
         </div>
       `;
     }
-  },
-
-  submitContact: (e) => {
-    e.preventDefault();
-    state.answers.name = document.getElementById('cf_name').value;
-    state.answers.phone = document.getElementById('cf_phone').value;
-    state.answers.email = document.getElementById('cf_email').value;
-    state.answers.location = document.getElementById('cf_location').value;
-    window.Funnel.submitToWebhook(false);
-    
-    // Jump straight into the popup flow starting at step 2
-    state.phase = 'step2';
-    state.qIndex = 0;
-    window.Funnel.openQuiz();
   },
 
   selectSingle: (field, value) => {
@@ -512,13 +540,10 @@ window.Funnel = {
   commitMulti: (field) => {
     const currentAns = state.answers[field] || [];
     const newAns = [...state.multiVals];
-    
-    // Check if array contents actually changed
     const isSame = currentAns.length === newAns.length && currentAns.every(v => newAns.includes(v));
     if (!isSame) {
       window.Funnel.clearAnswersAfterCurrentIndex();
     }
-
     state.answers[field] = newAns;
     state.multiVals = [];
     window.Funnel.goNext();
@@ -539,19 +564,14 @@ window.Funnel = {
 
   goNext: () => {
     const activeQ = window.Funnel.getActiveQuestions();
+    
     if (state.qIndex < activeQ.length - 1) {
       state.qIndex++;
       state.multiVals = [];
       window.Funnel.render();
     } else {
-      if (state.phase === 'step1') {
-        state.phase = 'step2'; state.qIndex = 0;
-      } else if (state.phase === 'step2') {
-        state.phase = 'step3'; state.qIndex = 0;
-      } else if (state.phase === 'step3') {
-        state.phase = 'result';
-        window.Funnel.submitToWebhook(true);
-      }
+      state.phase = 'result';
+      window.Funnel.submitToWebhook();
       state.multiVals = [];
       window.Funnel.render();
     }
@@ -579,50 +599,32 @@ window.Funnel = {
   },
 
   renderResult: () => {
-    const scores = calculateScores(state.answers);
     const contentArea = document.getElementById('quiz-content-area');
     document.getElementById('quiz-nav').style.display = 'none';
-    const secureBadge = document.getElementById('secure-badge');
-    if (secureBadge) secureBadge.style.display = 'none';
 
     const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
-    const shareMessage = "ඔබටත් සාර්ථක ව්‍යාපාරයක් ගොඩනගන්න අවශ්‍යද? එහෙමත් නැත්නම් tailoring field එකෙන් ඉස්සරහට යන්න කැමතිද? ව්‍යාපාරික දැනුම වගේම අලුත්ම technical skills ඉගෙනගන්න, Su Collection සහ UVA VEC එකතුවෙලා කරන මේ නොමිලේ workshop එකට ඔයාත් සම්බන්ධ වෙන්න!\n\nලියාපදිංචි වීමට: https://su-collection-x-uvavec.vercel.app/";
-    const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+    const groupLink = "https://chat.whatsapp.com/YOUR_GROUP_LINK_HERE";
 
     contentArea.innerHTML = `
       <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align:center;">
 
-          <h2 style="line-height: 1.4; font-size: clamp(1.2rem, 4vw, 1.5rem);">නියමයි, ${firstName}!<br><em style="font-size:clamp(0.9rem, 3vw, 1.1rem); font-style:normal; font-weight:400; color:var(--md-sys-color-primary);">Registration Successful</em></h2>
-          <p class="quiz-result-message" style="margin-top: 0.5rem; margin-bottom: 0.5rem; line-height: 1.6; font-size: clamp(0.9rem, 3vw, 1rem);">
-            ඔබේ තොරතුරු අපට ලැබුණා. අපි ඔබේ පිළිතුරු analyze කරලා තියෙන්නේ. ඔබේ personalised growth path එක ඔස්සේ ඊළඟ පියවර ගැන දැනුවත් කරන්න අපේ team එක ඉතා ඉක්මනින් ඔබව සම්බන්ධ කරගන්නවා ඇත.<br><br>
-            <em>We look forward to seeing you at the workshop!</em>
+          <h2 style="line-height: 1.4; font-size: clamp(1.2rem, 4vw, 1.5rem);">නියමයි, ${firstName}! 🎉<br><em style="font-size:clamp(0.9rem, 3vw, 1.1rem); font-style:normal; font-weight:400; color:var(--md-sys-color-primary);">Registration Successful</em></h2>
+          <p class="quiz-result-message" style="margin-top: 1rem; margin-bottom: 2rem; line-height: 1.6; font-size: clamp(0.9rem, 3vw, 1rem);">
+            ඔයාගේ විස්තර අපිට ලැබුණා. දැන් ඔයාට තියෙන්නේ අපේ නිල WhatsApp group එකට එකතු වෙන්න විතරයි. Workshop එකට අදාල හැම විස්තරයක්ම අපි ඒ group එකට දානවා.<br><br>
+            <em>Click the button below to join the WhatsApp group!</em>
           </p>
 
-          <div style="margin-top: 0; padding: clamp(1rem, 3vw, 1.5rem); background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); box-shadow: var(--elevation-2); border-radius: 16px; display: inline-block; max-width: 400px; width: 100%; margin-left: auto; margin-right: auto;">
-            <p style="font-size: clamp(0.9rem, 3vw, 1rem); color: var(--md-sys-color-on-surface); margin-bottom: 0.25rem; font-weight: 600;">
-              ඔබේ මිතුරන්ටත් මේ ගැන කියන්න!
-            </p>
-            <p style="font-size: clamp(0.75rem, 2.5vw, 0.85rem); color: var(--md-sys-color-on-surface-variant); margin-bottom: clamp(0.75rem, 3vw, 1.25rem);">
-              Invite a friend to the free workshop
-            </p>
-            <a href="${shareUrl}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25D366; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 100px; font-weight: 600; font-family: var(--font-sans); text-decoration: none; width: 100%; box-shadow: var(--elevation-1); transition: transform 0.2s; font-size: clamp(0.85rem, 3vw, 1rem);">
-              <img src="whatsapp.png" alt="WhatsApp" style="width:22px; height:22px; object-fit:contain;">
-              Share on WhatsApp
-            </a>
-          </div>
-        </div>
-
-        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--md-sys-color-outline-variant); font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); text-align: center;">
-          <strong>Su Collection & UVA VEC</strong><br>
-          <span style="font-size: 0.75rem; margin-top: 0.25rem; display: block;">© ${new Date().getFullYear()} All Rights Reserved.</span>
+          <a href="${groupLink}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; background-color:#25D366; color:#fff; border:none; padding:1rem 2rem; border-radius:30px; text-decoration:none; font-weight:700; font-size:1.1rem; width:100%; max-width:350px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            Join WhatsApp Group
+          </a>
         </div>
       </div>
     `;
   },
 
   updateProgressBar: () => {
-    // Update the small modal progress bar
     const phaseLabelEl = document.getElementById('quiz-phase-label');
     const fill = document.getElementById('quiz-progress-fill');
     
@@ -636,42 +638,59 @@ window.Funnel = {
     const currentQ = activeQ[state.qIndex];
     if (!currentQ) return;
 
-    const phaseLabel = state.phase === 'step2' ? 'Diagnostic' : 'Assessment';
-    if (phaseLabelEl) phaseLabelEl.innerText = phaseLabel;
+    if (phaseLabelEl) phaseLabelEl.innerHTML = currentQ.stepLabel;
     
-    // Calculate global progress based on the total number of questions in QUIZ_QUESTIONS
-    // contact-block is index 0 (which is skipped now), so total questions is length - 1.
-    const globalIdx = QUIZ_QUESTIONS.findIndex(q => q.id === currentQ.id);
-    const totalQ = QUIZ_QUESTIONS.length - 1; 
-    let percent = Math.round((globalIdx / totalQ) * 100);
-    if (percent < 5) percent = 5; // ensure it's at least visible
+
+    let percent = Math.round(((state.qIndex) / (activeQ.length)) * 100);
+    if (percent < 5) percent = 5; 
     
     if (fill) fill.style.width = `${percent}%`;
   },
 
-  renderPathPanel: () => {
-    // Disabled
-  },
+  submitToWebhook: async () => {
+    if (!WEBHOOK_URL || WEBHOOK_URL === "") return;
 
-  submitToWebhook: async (isFinal) => {
-    if (!WEBHOOK_URL || WEBHOOK_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE") return;
-    const scores = calculateScores(state.answers);
+    // Mapping for readable Google Sheet data
+    const sitMap = {
+      'learning': 'I am learning tailoring',
+      'job': 'I do tailoring as a job or service',
+      'tailoring-biz': 'I run a tailoring or clothing-related business',
+      'other-biz': 'I run another small business',
+      'planning': 'I am planning to start a business',
+      'other': 'Other / not sure yet'
+    };
+    
+    const goalMap = {
+      'improve-skills': 'Improve my tailoring skills',
+      'advanced-techniques': 'Learn advanced tailoring techniques',
+      'start-earning': 'Start earning through tailoring',
+      'grow-tailoring-biz': 'Grow my existing tailoring or clothing business',
+      'grow-business-online': 'Learn how to grow a business online using the necessary digital tools and systems.'
+    };
+
+    const skillMap = {
+      'beginner': 'Beginner / just starting',
+      'job': 'I work in the tailoring field',
+      'business': 'I already run a tailoring-related business',
+      'planning-tailoring': 'I\'m planning to start a tailoring-related business soon.',
+      'planning-other': 'I\'m hoping to start a different (non-tailoring) business',
+      'not-decided': 'I haven\'t decided yet'
+    };
+
+    const readableSit = sitMap[state.answers.currentSituation] || state.answers.currentSituation;
+    const readableSkill = skillMap[state.answers.tailoringSkill] || state.answers.tailoringSkill;
+    const rawGoals = state.answers.primaryGoal || [];
+    const readableGoals = rawGoals.map(g => goalMap[g] || g).join(', ');
+
     const payload = {
-      isFinal,
-      timestamp: new Date().toLocaleString('en-US', { 
-        year: 'numeric', month: 'short', day: 'numeric', 
-        hour: '2-digit', minute: '2-digit', hour12: true 
-      }),
       name: state.answers.name,
       phone: state.answers.phone,
       email: state.answers.email,
-      location: state.answers.location,
-      primaryRoute: scores.primary,
-      technicalScore: scores.technical,
-      businessScore: scores.business,
-      diyScore: scores.diy,
-      dfyScore: scores.dfy,
-      rawAnswers: JSON.stringify(state.answers)
+      country: state.answers.country,
+      district: state.answers.district,
+      currentSituation: readableSit,
+      primaryGoal: readableGoals,
+      tailoringSkill: readableSkill
     };
     try {
       fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
@@ -682,8 +701,5 @@ window.Funnel = {
   }
 };
 
-
 window.addEventListener('DOMContentLoaded', () => {
-  // We no longer automatically start rendering the funnel questions, 
-  // because step 1 is a static HTML form that triggers the funnel on submit.
 });
