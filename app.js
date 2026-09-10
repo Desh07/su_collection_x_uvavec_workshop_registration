@@ -32,7 +32,7 @@ const QUIZ_QUESTIONS = [
   {
     id: 'CONTACT-COUNTRY', field: 'country', type: 'country-select', phase: 'step1',
     stepLabel: bi('රට', 'Country'),
-    title: bi('ඔබ පදිංචි රට (ශ්‍රී ලංකාව නම් දිස්ත්‍රික්කය සඳහන් කරන්න)', 'Country'),
+    title: bi('ඔබ පදිංචි රට', 'Country'),
     optional: false,
   },
   {
@@ -122,6 +122,17 @@ window.Funnel = {
     const contentArea = document.getElementById('quiz-content-area');
     const navBar = document.getElementById('quiz-nav');
     const nextNavBtn = document.getElementById('btn-next-nav');
+    const prevBtn = document.getElementById('btn-prev');
+    
+    if (prevBtn) {
+      prevBtn.style.visibility = state.qIndex === 0 ? 'hidden' : 'visible';
+    }
+    
+    const introText = document.getElementById('quiz-intro-text');
+    if (introText) {
+      const showIntro = ['name', 'phone', 'email', 'country', 'district'].includes(currentQ.field);
+      introText.style.display = showIntro ? 'block' : 'none';
+    }
     
     // Check if it's the last question to change the "Next" button to "Submit"
     let nextBtnText = "ඉදිරියට / Next";
@@ -512,7 +523,7 @@ window.Funnel = {
             value="${existing}"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)">
           <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
-            <button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>
+            ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
             <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
           </div>
         </div>
@@ -702,4 +713,5 @@ window.Funnel = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  window.Funnel.openQuiz();
 });
