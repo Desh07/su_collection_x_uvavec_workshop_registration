@@ -1,4 +1,6 @@
 // ==========================================
+// [RESTORED] SU COLLECTION x UVA VEC - Vanilla JS Funnel
+// ==========================================
 // SU COLLECTION x UVA VEC - Vanilla JS Funnel
 // ==========================================
 
@@ -153,7 +155,7 @@ window.Funnel = {
       }
     }
 
-    const isSameQ = state.lastRenderedQ === currentQ.id;
+    const isSameQ = state.lastRenderedQ === currentQ.id || !state.lastRenderedQ;
     state.lastRenderedQ = currentQ.id;
 
     if (!isSameQ) {
@@ -517,11 +519,13 @@ window.Funnel = {
           <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
             ${currentQ.title}
           </div>
-          ${currentQ.optional ? '<p class="quiz-optional-note">අත්‍යාවශ්‍ය නොවේ &mdash; Optional</p>' : ''}
           <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
             placeholder="${currentQ.placeholder || ''}"
             value="${existing}"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)">
+          <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
+            කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>
+          </div>
           <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
             ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
             <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
@@ -564,6 +568,9 @@ window.Funnel = {
     state.answers[field] = value;
     const okBtn = document.getElementById('short-text-ok');
     const skipBtn = document.getElementById('short-text-skip');
+    const errDiv = document.getElementById('short-text-error');
+    if (errDiv) errDiv.style.display = 'none';
+
     if (value.trim().length > 0) {
       if (okBtn) okBtn.style.display = 'inline-flex';
       if (skipBtn) skipBtn.style.display = 'none';
@@ -575,6 +582,17 @@ window.Funnel = {
 
   goNext: () => {
     const activeQ = window.Funnel.getActiveQuestions();
+    const currentQ = activeQ[state.qIndex];
+
+    if (currentQ && currentQ.field === 'phone') {
+      const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
+      const isNum = /^\+?\d+$/.test(val);
+      if (!isNum) {
+        const errDiv = document.getElementById('short-text-error');
+        if (errDiv) errDiv.style.display = 'block';
+        return;
+      }
+    }
     
     if (state.qIndex < activeQ.length - 1) {
       state.qIndex++;
@@ -713,5 +731,7 @@ window.Funnel = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  window.Funnel.openQuiz();
+  setTimeout(() => {
+    window.Funnel.openQuiz();
+  }, 1000);
 });
