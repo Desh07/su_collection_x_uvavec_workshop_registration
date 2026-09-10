@@ -28,7 +28,7 @@ const QUIZ_QUESTIONS = [
     id: 'CONTACT-EMAIL', field: 'email', type: 'short-text', phase: 'step1',
     stepLabel: bi('විද්‍යුත් තැපැල් ලිපිනය', 'Email Address'),
     title: bi('විද්‍යුත් තැපැල් ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Not Mandatory)'),
-    placeholder: 'ඔයාගේ ඊමේල් එක (අනිවාර්ය නෑ) / Optional',
+    placeholder: 'ඊමේල් (අනිවාර්ය නොවේ) / Email (Optional)',
     optional: true,
   },
   {

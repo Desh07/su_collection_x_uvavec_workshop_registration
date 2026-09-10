@@ -42,16 +42,16 @@
           <div class="form-card-box" style="align-items:center; text-align:center; background: var(--md-sys-color-surface); padding: 2.5rem; border-radius: 24px; box-shadow: var(--elevation-3);">
             
             <!-- Event Date/Time Block -->
-            <div style="display:inline-flex; align-items:center; gap:1.25rem; margin-bottom: 2rem;">
-              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--md-sys-color-primary); color:var(--md-sys-color-on-primary); border-radius:12px; padding: 0.5rem 1.25rem; box-shadow:var(--elevation-2);">
-                <span style="font-size:0.8rem; text-transform:uppercase; font-weight:700; letter-spacing:0.1em; opacity:0.9;">Sept</span>
-                <span style="font-size:2rem; font-family:var(--font-serif); font-weight:700; line-height:1;">19</span>
-              </div>
-              <div style="display:flex; flex-direction:column; text-align:left;">
-                <span style="font-size:1.1rem; font-weight:700; color:var(--ink);">Saturday @ 10:00 AM</span>
-                <span style="font-size:0.9rem; color:var(--ink-muted); margin-top:0.1rem;">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
-              </div>
+          <div class="event-date-block">
+            <div class="event-date-cal">
+              <span class="event-date-month">Sept</span>
+              <span class="event-date-day">19</span>
             </div>
+            <div class="event-date-text">
+              <span class="event-date-time">සෙනසුරාදා / Saturday @ 10:00 AM</span>
+              <span class="event-date-desc">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
+            </div>
+          </div>
 
             <h2 class="quiz-q-title" style="color:var(--md-sys-color-primary); margin-bottom:0.25rem;">ඔබේ Free Spot එක අදම වෙන්කරගන්න</h2>
             <p style="color:var(--md-sys-color-on-surface-variant); margin-bottom: 2rem; line-height: 1.5;">
@@ -92,14 +92,14 @@
         </div>
         
         <div id="quiz-intro-text" style="display: none; text-align: center; padding: 1.5rem 2rem 0; font-family: var(--font-sans);">
-          <div style="display:inline-flex; align-items:center; gap:1rem; margin-bottom: 1.5rem; justify-content: center; width: 100%;">
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--md-sys-color-primary); color:var(--md-sys-color-on-primary); border-radius:12px; padding: 0.4rem 1rem; box-shadow:var(--elevation-2);">
-              <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; letter-spacing:0.1em; opacity:0.9;">Sept</span>
-              <span style="font-size:1.75rem; font-family:var(--font-serif); font-weight:700; line-height:1;">19</span>
+          <div class="event-date-block" style="margin-bottom: 1.5rem; justify-content: center; width: 100%;">
+            <div class="event-date-cal">
+              <span class="event-date-month">Sept</span>
+              <span class="event-date-day">19</span>
             </div>
-            <div style="display:flex; flex-direction:column; text-align:left;">
-              <span style="font-size:1rem; font-weight:700; color:var(--ink);">Saturday @ 10:00 AM</span>
-              <span style="font-size:0.85rem; color:var(--ink-muted); margin-top:0.1rem;">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
+            <div class="event-date-text">
+              <span class="event-date-time" style="font-size: 1rem;">සෙනසුරාදා / Saturday @ 10:00 AM</span>
+              <span class="event-date-desc" style="font-size: 0.85rem;">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
             </div>
           </div>
           <h2 style="font-size: 1.25rem; font-family: var(--font-serif); margin-bottom: 0.5rem; color: var(--md-sys-color-primary); font-weight: 700;">ඔබේ Free Spot එක අදම වෙන්කරගන්න</h2>
