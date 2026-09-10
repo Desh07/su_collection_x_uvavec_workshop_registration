@@ -210,12 +210,10 @@ window.Funnel = {
         `;
       });
       html += `</div>
-        <div style="position: sticky; bottom: 0; padding-top: 0.5rem; background: var(--md-sys-color-surface); z-index: 5;">
-          <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
-            ${state.multiVals.length === 0 ? 'disabled' : ''} style="width: 100%; margin-top: 0.5rem; ${isLastQ ? 'background:#000;color:#fff;' : ''}">
-            ${isLastQ ? 'Submit' : 'OK'}
-          </button>
-        </div>
+        <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
+          ${state.multiVals.length === 0 ? 'disabled' : ''} style="${isLastQ ? 'background:#000;color:#fff;' : ''}">
+          ${isLastQ ? 'Submit' : 'OK'}
+        </button>
       </div>`;
       contentArea.innerHTML = html;
     }
@@ -694,7 +692,7 @@ window.Funnel = {
     const currentQ = activeQ[state.qIndex];
     if (!currentQ) return;
 
-    if (phaseLabelEl) phaseLabelEl.innerHTML = `Step ${state.qIndex + 1} of ${activeQ.length} &mdash; ${currentQ.stepLabel}`;
+    if (phaseLabelEl) phaseLabelEl.innerHTML = `Step ${state.qIndex + 1}`;
     
 
     let percent = Math.round(((state.qIndex) / (activeQ.length)) * 100);
