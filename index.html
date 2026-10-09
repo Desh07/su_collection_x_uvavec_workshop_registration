@@ -46,16 +46,22 @@
         <div class="form-card-container">
           <div class="form-card-box" style="align-items:center; text-align:center; background: var(--md-sys-color-surface); padding: 2.5rem; border-radius: 24px; box-shadow: var(--elevation-3);">
             
-            <!-- Event Date/Time Block -->
-          <div class="event-date-block">
+          <!-- Event Date/Time Block -->
+          <div class="event-date-block" id="home-event-date-block">
             <div class="event-date-cal">
-              <span class="event-date-month">Sept</span>
-              <span class="event-date-day">19</span>
+              <span class="event-date-month" id="home-event-month">Sept</span>
+              <span class="event-date-day" id="home-event-day">19</span>
             </div>
             <div class="event-date-text">
-              <span class="event-date-time"><span class="date-part-wrap">සෙනසුරාදා | Saturday</span><span class="time-sep-wrap"> | </span><span class="time-part-wrap">6:00 PM – 7:30 PM</span></span>
+              <span class="event-date-time"><span class="date-part-wrap">සෙනසුරාදා | Saturday</span><span class="time-sep-wrap"> | </span><span class="time-part-wrap" id="home-event-time">6:00 PM – 7:30 PM</span></span>
               <span class="event-date-desc">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
             </div>
+          </div>
+          
+          <!-- Post Workshop Alert -->
+          <div id="post-workshop-alert" style="display: none; background: #fff3cd; color: #856404; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; border: 1px solid #ffeeba;">
+            <p style="margin:0; font-weight: 600;">Our first workshop is over!</p>
+            <p style="margin:0.25rem 0 0 0;" id="post-workshop-alert-text">You will be included for our next workshop on the 3rd Saturday of next month.</p>
           </div>
 
             <h2 class="quiz-q-title" style="color:var(--md-sys-color-primary); margin-bottom:0.25rem;">ඔබේ අවස්ථාව අදම වෙන් කරගන්න</h2>
@@ -96,13 +102,13 @@
         </div>
         
         <div id="quiz-intro-text" style="display: none; text-align: center; padding: 1.5rem 2rem 0; font-family: var(--font-sans);">
-          <div class="event-date-block" style="margin-bottom: 1.5rem; justify-content: center; width: 100%;">
+          <div class="event-date-block" id="modal-event-date-block" style="margin-bottom: 1.5rem; justify-content: center; width: 100%;">
             <div class="event-date-cal">
-              <span class="event-date-month">Sept</span>
-              <span class="event-date-day">19</span>
+              <span class="event-date-month" id="modal-event-month">Sept</span>
+              <span class="event-date-day" id="modal-event-day">19</span>
             </div>
             <div class="event-date-text">
-              <span class="event-date-time" style="font-size: 1rem;"><span class="date-part-wrap">සෙනසුරාදා | Saturday</span><span class="time-sep-wrap"> | </span><span class="time-part-wrap">6:00 PM – 7:30 PM</span></span>
+              <span class="event-date-time" style="font-size: 1rem;"><span class="date-part-wrap">සෙනසුරාදා | Saturday</span><span class="time-sep-wrap"> | </span><span class="time-part-wrap" id="modal-event-time">6:00 PM – 7:30 PM</span></span>
               <span class="event-date-desc" style="font-size: 0.85rem;">නොමිලේ පැවැත්වෙන විශේෂ වැඩමුළුව</span>
             </div>
           </div>

@@ -125,17 +125,17 @@ window.Funnel = {
     const navBar = document.getElementById('quiz-nav');
     const nextNavBtn = document.getElementById('btn-next-nav');
     const prevBtn = document.getElementById('btn-prev');
-    
+
     if (prevBtn) {
       prevBtn.style.visibility = state.qIndex === 0 ? 'hidden' : 'visible';
     }
-    
+
     const introText = document.getElementById('quiz-intro-text');
     if (introText) {
       const showIntro = ['name', 'phone', 'email', 'country', 'district'].includes(currentQ.field);
       introText.style.display = showIntro ? 'block' : 'none';
     }
-    
+
     // Check if it's the last question to change the "Next" button to "Submit"
     let nextBtnText = "ඉදිරියට / Next";
     let isLastQ = (state.qIndex === activeQ.length - 1);
@@ -221,7 +221,7 @@ window.Funnel = {
       navBar.style.display = state.qIndex === 0 ? 'none' : 'flex';
       const existing = state.answers[currentQ.field] || '';
       const hasSelection = existing.trim().length > 0;
-      
+
       let optionsHtml = '';
       if (currentQ.type === 'country-select') {
         optionsHtml = `
@@ -456,16 +456,16 @@ window.Funnel = {
         if (m[1] === '') return ''; // skip the disabled placeholder
         return `<div class="custom-select-option" onclick="window.Funnel.saveText('${currentQ.field}', '${m[1]}'); document.getElementById('custom-select-modal').style.display='none'; window.Funnel.goNext();">${m[2]}</div>`;
       }).join('');
-      
+
       let triggerText = 'තෝරන්න / Select...';
       if (existing) {
         const selectedMatch = optionMatches.find(m => m[1] === existing);
         if (selectedMatch) triggerText = selectedMatch[2];
       }
-      
+
       // Simple text version of title for the modal header
       const headerTitle = currentQ.type === 'country-select' ? 'රට තෝරන්න / Select Country' : 'දිස්ත්‍රික්කය තෝරන්න / Select District';
-      
+
       const globalContainer = document.getElementById('global-select-container');
       if (globalContainer) {
         globalContainer.innerHTML = `
@@ -503,7 +503,7 @@ window.Funnel = {
           ` : ''}
         </div>
       `;
-      
+
       if (existing) {
         setTimeout(() => {
           const selectEl = contentArea.querySelector('select');
@@ -536,13 +536,13 @@ window.Funnel = {
           </div>
         </div>
       `;
-      
+
       setTimeout(() => {
         const inputEl = document.getElementById('short-text-input');
-        
+
         if (currentQ.field === 'phone' && inputEl) {
           if (window.iti) { window.iti.destroy(); }
-          
+
           window.iti = window.intlTelInput(inputEl, {
             initialCountry: "lk",
             strictMode: true,
@@ -551,7 +551,7 @@ window.Funnel = {
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js"
           });
         }
-        
+
         if (inputEl && !isSameQ) inputEl.focus();
       }, 50);
     }
@@ -610,7 +610,7 @@ window.Funnel = {
       let isValid = false;
       if (window.iti) {
         isValid = window.iti.isValidNumber();
-        
+
         // Strict Mobile Prefix Check
         if (isValid) {
           const numberType = window.iti.getNumberType(); // Returns integer
@@ -619,7 +619,7 @@ window.Funnel = {
             isValid = false; // Reject if it's a legacy landline, pager, or fake prefix
           }
         }
-        
+
         if (isValid) {
           state.answers['phone'] = window.iti.getNumber();
         }
@@ -627,7 +627,7 @@ window.Funnel = {
         const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
         isValid = /^\+?\d+$/.test(val) && val.length >= 8;
       }
-      
+
       if (!isValid) {
         const errDiv = document.getElementById('short-text-error');
         if (errDiv) errDiv.style.display = 'block';
@@ -644,7 +644,7 @@ window.Funnel = {
         }
       }
     }
-    
+
     if (state.qIndex < activeQ.length - 1) {
       state.qIndex++;
       state.multiVals = [];
@@ -669,7 +669,7 @@ window.Funnel = {
     const activeQ = window.Funnel.getActiveQuestions();
     const currentQ = activeQ[state.qIndex];
     if (!currentQ) return;
-    
+
     const globalIdx = QUIZ_QUESTIONS.findIndex(q => q.id === currentQ.id);
     if (globalIdx === -1) return;
 
@@ -685,6 +685,27 @@ window.Funnel = {
     const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
     const groupLink = "https://chat.whatsapp.com/YOUR_GROUP_LINK_HERE";
 
+    let workshopDateStr = "Saturday | September 19 | 6:00 PM – 7:30 PM";
+    const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
+    if (new Date() > firstWorkshopDate) {
+      const now = new Date();
+      let d = new Date(now.getFullYear(), now.getMonth(), 1);
+      while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+      d.setDate(d.getDate() + 14);
+
+      if (now > d) {
+        let nextMonth = now.getMonth() + 1;
+        let year = now.getFullYear();
+        if (nextMonth > 11) { nextMonth = 0; year++; }
+        d = new Date(year, nextMonth, 1);
+        while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+        d.setDate(d.getDate() + 14);
+      }
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      workshopDateStr = `Saturday | ${monthNames[d.getMonth()]} ${d.getDate()} | 6:00 PM – 7:30 PM`;
+    }
+
     contentArea.innerHTML = `
       <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align:center;">
@@ -697,7 +718,7 @@ window.Funnel = {
 
           <div style="background: var(--md-sys-color-surface-variant); padding: 1.25rem; border-radius: 12px; margin: 2rem 0; width: 100%; text-align: center;">
             <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--ink);">📅 Workshop Details</div>
-            <div style="font-size: 0.95rem; color: var(--ink-muted); font-weight: 500;">Saturday | September 19 | 6:00 PM – 7:30 PM</div>
+            <div style="font-size: 0.95rem; color: var(--ink-muted); font-weight: 500;">${workshopDateStr}</div>
           </div>
 
           <p class="quiz-result-message" style="margin-bottom: 2rem; line-height: 1.6; font-size: clamp(0.95rem, 3vw, 1.05rem); max-width: 400px; color: var(--ink);">
@@ -716,7 +737,7 @@ window.Funnel = {
   updateProgressBar: () => {
     const phaseLabelEl = document.getElementById('quiz-phase-label');
     const fill = document.getElementById('quiz-progress-fill');
-    
+
     if (state.phase === 'result') {
       if (phaseLabelEl) phaseLabelEl.innerText = 'Complete';
       if (fill) fill.style.width = '100%';
@@ -728,11 +749,11 @@ window.Funnel = {
     if (!currentQ) return;
 
     if (phaseLabelEl) phaseLabelEl.innerHTML = `Step ${state.qIndex + 1}`;
-    
+
 
     let percent = Math.round(((state.qIndex) / (activeQ.length)) * 100);
-    if (percent < 5) percent = 5; 
-    
+    if (percent < 5) percent = 5;
+
     if (fill) fill.style.width = `${percent}%`;
   },
 
@@ -748,7 +769,7 @@ window.Funnel = {
       'planning': 'I am planning to start a business',
       'other': 'Other / not sure yet'
     };
-    
+
     const goalMap = {
       'improve-skills': 'Improve my tailoring skills',
       'advanced-techniques': 'Learn advanced tailoring techniques',
@@ -791,6 +812,47 @@ window.Funnel = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
+  if (new Date() > firstWorkshopDate) {
+    const now = new Date();
+    let d = new Date(now.getFullYear(), now.getMonth(), 1);
+    while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+    d.setDate(d.getDate() + 14);
+
+    if (now > d) {
+      let nextMonth = now.getMonth() + 1;
+      let year = now.getFullYear();
+      if (nextMonth > 11) { nextMonth = 0; year++; }
+      d = new Date(year, nextMonth, 1);
+      while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+      d.setDate(d.getDate() + 14);
+    }
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const monthStr = monthNames[d.getMonth()];
+    const dayStr = d.getDate();
+
+    const alertBox = document.getElementById('post-workshop-alert');
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      const alertText = document.getElementById('post-workshop-alert-text');
+      if (alertText) {
+        alertText.innerText = `You will be included for our next workshop on Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}.`;
+      }
+    }
+
+    ['home-event-month', 'modal-event-month'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = monthStr;
+    });
+    ['home-event-day', 'modal-event-day'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = dayStr;
+    });
+  }
+
   setTimeout(() => {
     window.Funnel.openQuiz();
   }, 1000);
