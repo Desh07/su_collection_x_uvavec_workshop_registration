@@ -685,23 +685,10 @@ window.Funnel = {
     const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
     const groupLink = "https://chat.whatsapp.com/YOUR_GROUP_LINK_HERE";
 
-    let workshopDateStr = "Saturday | September 19 | 6:00 PM – 7:30 PM";
+    let workshopDateStr = "Saturday | October 31 | 6:00 PM – 7:30 PM";
     const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
     if (new Date() > firstWorkshopDate) {
-      const now = new Date();
-      let d = new Date(now.getFullYear(), now.getMonth(), 1);
-      while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
-      d.setDate(d.getDate() + 14);
-
-      if (now > d) {
-        let nextMonth = now.getMonth() + 1;
-        let year = now.getFullYear();
-        if (nextMonth > 11) { nextMonth = 0; year++; }
-        d = new Date(year, nextMonth, 1);
-        while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
-        d.setDate(d.getDate() + 14);
-      }
-
+      const d = getUpcomingWorkshopDate();
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       workshopDateStr = `Saturday | ${monthNames[d.getMonth()]} ${d.getDate()} | 6:00 PM – 7:30 PM`;
     }
@@ -811,22 +798,26 @@ window.Funnel = {
   }
 };
 
+function getUpcomingWorkshopDate() {
+  const now = new Date();
+  const octWorkshop = new Date(2026, 9, 31, 23, 59, 59); // Oct 31, 2026 cutoff
+  if (now <= octWorkshop) {
+    return new Date(2026, 9, 31);
+  }
+  // After Oct 31, 2026: calculate the 3rd Saturday of the upcoming month
+  let nextMonth = now.getMonth() + 1;
+  let year = now.getFullYear();
+  if (nextMonth > 11) { nextMonth = 0; year++; }
+  let d = new Date(year, nextMonth, 1);
+  while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+  d.setDate(d.getDate() + 14);
+  return d;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
   if (new Date() > firstWorkshopDate) {
-    const now = new Date();
-    let d = new Date(now.getFullYear(), now.getMonth(), 1);
-    while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
-    d.setDate(d.getDate() + 14);
-
-    if (now > d) {
-      let nextMonth = now.getMonth() + 1;
-      let year = now.getFullYear();
-      if (nextMonth > 11) { nextMonth = 0; year++; }
-      d = new Date(year, nextMonth, 1);
-      while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
-      d.setDate(d.getDate() + 14);
-    }
+    const d = getUpcomingWorkshopDate();
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
