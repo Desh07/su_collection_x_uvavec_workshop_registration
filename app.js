@@ -524,11 +524,12 @@ window.Funnel = {
           <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
             placeholder="${currentQ.placeholder || ''}"
             value="${existing}"
+            maxlength="${currentQ.field === 'name' ? '60' : (currentQ.field === 'phone' ? '20' : '80')}"
             onfocus="setTimeout(() => { this.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 300)"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
             onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
           <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
-            ${currentQ.field === 'email' ? 'නිවැරදි Email ලිපිනයක් යොමු කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid email address</span>' : 'කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>'}
+            ${currentQ.field === 'name' ? 'කරුණාකර වලංගු නමක් ඇතුලත් කරන්න (අවම අකුරු 3ක්) <br> <span style="font-size:0.75rem;">Please enter a valid full name (min. 3 letters, no numbers)</span>' : (currentQ.field === 'email' ? 'නිවැරදි Email ලිපිනයක් යොමු කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid email address</span>' : 'කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>')}
           </div>
           <div style="display:flex; justify-content:center; gap:1rem; margin-top:0.75rem;">
             ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
@@ -606,7 +607,21 @@ window.Funnel = {
     const activeQ = window.Funnel.getActiveQuestions();
     const currentQ = activeQ[state.qIndex];
 
-    if (currentQ && currentQ.field === 'phone') {
+    if (currentQ && currentQ.field === 'name') {
+      const val = (state.answers['name'] || '').trim();
+      const nameRegex = /^[\p{L}\s.'\-]+$/u;
+      const isValid = val.length >= 3 && val.length <= 60 && nameRegex.test(val);
+
+      if (!isValid) {
+        const errDiv = document.getElementById('short-text-error');
+        if (errDiv) {
+          errDiv.innerHTML = 'කරුණාකර වලංගු නමක් ඇතුලත් කරන්න (අවම අකුරු 3ක්) <br> <span style="font-size:0.75rem;">Please enter a valid full name (min. 3 letters, no numbers)</span>';
+          errDiv.style.display = 'block';
+        }
+        return;
+      }
+      state.answers['name'] = val;
+    } else if (currentQ && currentQ.field === 'phone') {
       let isValid = false;
       if (window.iti) {
         isValid = window.iti.isValidNumber();
