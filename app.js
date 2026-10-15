@@ -830,7 +830,7 @@ window.addEventListener('DOMContentLoaded', () => {
       alertBox.style.display = 'block';
       const alertText = document.getElementById('post-workshop-alert-text');
       if (alertText) {
-        alertText.innerText = `You will be included for our next workshop on Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}.`;
+        alertText.innerText = `Join our next live online workshop on Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}. Reserve your free spot today!`;
       }
     }
 
