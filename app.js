@@ -830,7 +830,7 @@ window.addEventListener('DOMContentLoaded', () => {
       alertBox.style.display = 'block';
       const alertText = document.getElementById('post-workshop-alert-text');
       if (alertText) {
-        alertText.innerText = `Join our next live online workshop on Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}. Reserve your free spot today!`;
+        alertText.innerHTML = `Join our next live online workshop on <strong style="color: var(--md-sys-color-primary, #E87A76); font-weight: 700;">Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}</strong>. Reserve your free spot today!`;
       }
     }
 
