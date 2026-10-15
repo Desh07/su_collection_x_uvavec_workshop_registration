@@ -4,7 +4,7 @@
 // SU COLLECTION x UVA VEC - Vanilla JS Funnel
 // ==========================================
 
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwTDfrks1x-dRDNnwsGQLJuP8h6PZgoJn49w6VySphaO_Yp7oZoQ-en9bpKx7EeuBi52g/exec";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwDgJwCp8YaoSDj9jSPDCvQy11xghvPuUf225PNyWWEy-Ok6SGXZmeD_xtWcP1zxu7Aug/exec";
 
 // Helper: bilingual label
 const bi = (sin, eng) => `<span class="sin">${sin}</span><span class="eng">${eng}</span>`;
