@@ -21,7 +21,7 @@ const QUIZ_QUESTIONS = [
     id: 'CONTACT-PHONE', field: 'phone', type: 'short-text', phase: 'step1',
     stepLabel: bi('WhatsApp අංකය', 'WhatsApp Number'),
     title: bi('WhatsApp අංකය', 'WhatsApp Number'),
-    placeholder: '07XXXXXXXX',
+    placeholder: '',
     optional: false,
   },
   {
@@ -522,9 +522,9 @@ window.Funnel = {
             ${currentQ.title}
           </div>
           <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
-            placeholder="${currentQ.placeholder || ''}"
+            placeholder="${currentQ.field === 'phone' ? '' : (currentQ.placeholder || '')}"
             value="${existing}"
-            maxlength="${currentQ.field === 'name' ? '60' : (currentQ.field === 'phone' ? '20' : '80')}"
+            maxlength="${currentQ.field === 'name' ? '60' : (currentQ.field === 'phone' ? '25' : '80')}"
             onfocus="setTimeout(() => { this.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 300)"
             oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
             onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
@@ -546,10 +546,18 @@ window.Funnel = {
 
           window.iti = window.intlTelInput(inputEl, {
             initialCountry: "lk",
+            autoPlaceholder: "aggressive",
+            placeholderNumberType: "MOBILE",
+            nationalMode: true,
             strictMode: true,
             useFullscreenPopup: true,
             dropdownContainer: document.body,
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js"
+          });
+
+          inputEl.addEventListener('countrychange', () => {
+            const errDiv = document.getElementById('short-text-error');
+            if (errDiv) errDiv.style.display = 'none';
           });
         }
 
@@ -624,19 +632,32 @@ window.Funnel = {
     } else if (currentQ && currentQ.field === 'phone') {
       let isValid = false;
       if (window.iti) {
+        // 1. Google libphonenumber validation across all 240+ countries
         isValid = window.iti.isValidNumber();
 
-        // Strict Mobile Prefix Check
+        // 2. Reject landlines, toll-free, and pagers across all countries
         if (isValid) {
-          const numberType = window.iti.getNumberType(); // Returns integer
-          // 1 = MOBILE, 2 = FIXED_LINE_OR_MOBILE (Used in US/Canada)
-          if (numberType !== 1 && numberType !== 2) {
-            isValid = false; // Reject if it's a legacy landline, pager, or fake prefix
+          const numberType = window.iti.getNumberType();
+          // 0 = FIXED_LINE, 3 = TOLL_FREE, 4 = PREMIUM_RATE, 8 = PAGER
+          if (numberType === 0 || numberType === 3 || numberType === 4 || numberType === 8) {
+            isValid = false;
+          }
+        }
+
+        // 3. Strict Sri Lankan mobile check (must be a valid 07X mobile series)
+        if (isValid) {
+          const countryData = window.iti.getSelectedCountryData();
+          if (countryData && countryData.iso2 === 'lk') {
+            const raw = (document.getElementById('short-text-input')?.value || state.answers['phone'] || '').replace(/[\s\-]/g, '');
+            const isLkMobile = /^(?:0|(?:\+94))?7[0-9]{8}$/.test(raw) || /^7[0-9]{8}$/.test(raw);
+            if (!isLkMobile) {
+              isValid = false;
+            }
           }
         }
 
         if (isValid) {
-          state.answers['phone'] = window.iti.getNumber();
+          state.answers['phone'] = window.iti.getNumber(); // Clean E.164 format (+9477..., +447...)
         }
       } else {
         const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
