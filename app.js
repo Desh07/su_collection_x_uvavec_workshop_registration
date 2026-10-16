@@ -521,7 +521,7 @@ window.Funnel = {
           <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
             ${currentQ.title}
           </div>
-          <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="text-align: center;"
+          <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="${currentQ.field === 'phone' ? 'text-align: left;' : 'text-align: center;'}"
             placeholder="${currentQ.field === 'phone' ? '' : (currentQ.placeholder || '')}"
             value="${existing}"
             maxlength="${currentQ.field === 'name' ? '60' : (currentQ.field === 'phone' ? '25' : '80')}"
@@ -546,9 +546,10 @@ window.Funnel = {
 
           window.iti = window.intlTelInput(inputEl, {
             initialCountry: "lk",
+            separateDialCode: true,
             autoPlaceholder: "aggressive",
             placeholderNumberType: "MOBILE",
-            nationalMode: true,
+            nationalMode: false,
             strictMode: true,
             useFullscreenPopup: true,
             dropdownContainer: document.body,

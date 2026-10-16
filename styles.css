@@ -198,7 +198,16 @@ p { font-size: 1.05rem; color: var(--ink-muted); line-height: 1.75; }
 /* Short-text input */
 .quiz-text-input { width: 100%; padding: 1rem; border: 1px solid var(--md-sys-color-outline); border-radius: 4px; font-family: var(--font-sans); font-size: 1rem; color: var(--md-sys-color-on-surface); transition: border-color 0.2s; background: transparent; margin-top: 0.5rem; }
 .quiz-text-input:focus { border-color: var(--md-sys-color-primary); border-width: 2px; padding: calc(1rem - 1px); outline: none; }
-.iti { width: 100%; }
+.iti { width: 100%; display: block; }
+.iti--separate-dial-code .iti__selected-dial-code {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1rem;
+}
+.iti input.quiz-text-input {
+  text-align: left !important;
+}
 .iti--container { z-index: 99999 !important; }
 
 /* Force intl-tel-input fullscreen popup to match our custom modals */
