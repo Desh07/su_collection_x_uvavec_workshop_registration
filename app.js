@@ -1,887 +1,294 @@
-// ==========================================
-// [RESTORED] SU COLLECTION x UVA VEC - Vanilla JS Funnel
-// ==========================================
-// SU COLLECTION x UVA VEC - Vanilla JS Funnel
-// ==========================================
-
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwDgJwCp8YaoSDj9jSPDCvQy11xghvPuUf225PNyWWEy-Ok6SGXZmeD_xtWcP1zxu7Aug/exec";
-
-// Helper: bilingual label
-const bi = (sin, eng) => `<span class="sin">${sin}</span><span class="eng">${eng}</span>`;
-
-const QUIZ_QUESTIONS = [
-  {
-    id: 'CONTACT-NAME', field: 'name', type: 'short-text', phase: 'step1',
-    stepLabel: bi('සම්පූර්ණ නම', 'Full Name'),
-    title: bi('සම්පූර්ණ නම', 'Full Name'),
-    placeholder: 'උදා: නදීශා විජේරත්න / e.g. Nadeesha Wijeratna',
-    optional: false,
-  },
-  {
-    id: 'CONTACT-PHONE', field: 'phone', type: 'short-text', phase: 'step1',
-    stepLabel: bi('WhatsApp අංකය', 'WhatsApp Number'),
-    title: bi('WhatsApp අංකය', 'WhatsApp Number'),
-    placeholder: '',
-    optional: false,
-  },
-  {
-    id: 'CONTACT-EMAIL', field: 'email', type: 'short-text', phase: 'step1',
-    stepLabel: bi('Email ලිපිනය', 'Email Address'),
-    title: bi('Email ලිපිනය (අනිවාර්ය නොවේ)', 'Email Address (Optional)'),
-    placeholder: 'උදා: nadeeshawijeratna@gmail.com',
-    optional: true,
-  },
-  {
-    id: 'CONTACT-COUNTRY', field: 'country', type: 'country-select', phase: 'step1',
-    stepLabel: bi('රට', 'Country'),
-    title: bi('ඔබ පදිංචි රට', 'Country'),
-    optional: false,
-  },
-  {
-    id: 'CONTACT-DISTRICT', field: 'district', type: 'district-select', phase: 'step1',
-    stepLabel: bi('දිස්ත්‍රික්කය', 'District'),
-    title: bi('දිස්ත්‍රික්කය සඳහන් කරන්න', 'Which district are you from?'),
-    showIf: (a) => a.country === 'Sri Lanka',
-    optional: false,
-  },
-  {
-    id: 'DIAG-01', field: 'currentSituation', type: 'single-choice', phase: 'step1',
-    stepLabel: bi('ඔයා ගැන', 'About You'),
-    title: bi('ඔයා ගැන වැඩියෙන්ම විස්තර කරන්නෙ කොහොමද?', 'Which best describes you?'),
-    choices: [
-      { key: 'A', value: 'learning', label: bi('මම මැහුම් කටයුතු ඉගෙන ගන්නවා', 'I am learning tailoring') },
-      { key: 'B', value: 'job', label: bi('මම මැහුම් කටයුතු රැකියාවක් හෝ සේවාවක් විදිහට කරනවා', 'I do tailoring as a job or service') },
-      { key: 'C', value: 'tailoring-biz', label: bi('මම මැහුම් කටයුතු හා සම්බන්ධ ව්‍යාපාරයක් කරනවා', 'I run a tailoring or clothing-related business') },
-      { key: 'D', value: 'other-biz', label: bi('මම වෙනත් කුඩා ව්‍යාපාරයක් කරනවා', 'I run another small business') },
-      { key: 'E', value: 'planning', label: bi('මම ව්‍යාපාරයක් පටන් ගන්න plan කරනවා', 'I am planning to start a business') },
-      { key: 'F', value: 'other', label: bi('වෙනත් / තාම තීරණයක් අරගෙන නෑ', 'Other / not sure yet') },
-    ]
-  },
-  {
-    id: 'DIAG-02', field: 'primaryGoal', type: 'multi-select', phase: 'step1',
-    stepLabel: bi('අරමුණ', 'Primary Goal'),
-    title: bi('ඇයි ඔයා මේකට සම්බන්ධ වෙන්නෙ?', 'Primary goal for joining?'),
-    choices: [
-      { key: 'A', value: 'improve-skills', label: bi('මැහුම් කුසලතා වැඩිදියුණු කරගන්න', 'Improve my tailoring skills') },
-      { key: 'B', value: 'advanced-techniques', label: bi('විධිමත් ක්‍රමයට සංකීර්ණ මැහුම් ක්‍රම පහසුවෙන් ඉගෙනගන්න', 'Learn advanced tailoring techniques') },
-      { key: 'C', value: 'start-earning', label: bi('මැහුම් කටයුතු වලින් ආදායමක් ලබා ගන්න', 'Start earning through tailoring') },
-      { key: 'D', value: 'grow-tailoring-biz', label: bi('දැනට කරගෙන යන මැහුම් කටයුතු හෝ ව්‍යාපාරය දියුණු කරගන්න', 'Grow my existing tailoring or clothing business') },
-      { key: 'E', value: 'grow-business-online', label: bi('අවශ්‍ය digital tools/systems භාවිතයෙන් ව්‍යාපාරයක් online හරහා දියුණු කරගන්න හැටි ඉගෙන ගන්න', 'Learn how to grow a business online using the necessary digital tools and systems.') },
-    ]
-  },
-  {
-    id: 'TECH-01', field: 'tailoringSkill', type: 'single-choice', phase: 'step1',
-    stepLabel: bi('කුසලතා මට්ටම', 'Skill Level'),
-    title: bi('දැනට ඔයාගෙ skill level එක කොහොමද?', 'Current tailoring skill level'),
-    choices: [
-      { key: 'A', value: 'beginner', label: bi('තාම මම ආධුනිකයි / අලුතින්ම ඉගෙන ගන්නවා', 'Beginner / just starting') },
-      { key: 'B', value: 'basic', label: bi('මූලික දැනුම තිබෙනවා, තව ඉගෙනීමට බලාපොරොත්තු වෙනවා', 'I have basic knowledge and want to learn more') },
-      { key: 'C', value: 'intermediate', label: bi('මූලික මැහුම් කරන්න පුලුවන්, නමුත් තව වැඩිදියුණු කරගන්න කැමතියි', 'I can do basic tailoring but want to improve') },
-      { key: 'D', value: 'regular', label: bi('නිතරම මැහුම් කටයුතු වල නිරත වෙනවා', 'I regularly do tailoring') },
-      { key: 'E', value: 'professional', label: bi('වෘත්තීය මට්ටමින් මැහුම් කටයුතු කරනවා', 'I work professionally in tailoring') },
-      { key: 'F', value: 'experienced', label: bi('හොඳ පළපුරුද්දක් තියනව, තවත් වෘත්තීය කුසලතා ඉගෙනීමට කැමතියි', 'I’m experienced and want to learn advanced skills') },
-    ]
+/* Four-question workshop registration. No personal data is persisted in this browser. */
+(() => {
+  'use strict';
+  const config = window.WORKSHOP_CONFIG || { mode: 'preview' };
+  const preview = config.mode !== 'production';
+  const event = config.event || {};
+  const eventId = config.event_id || config.eventId || event.id || 'su-workshop-2026-11-14';
+  const questions = [
+    { id: 'Q1', title: 'ඔබ මෙම වැඩමුළුවට එක්වීමට ප්‍රධාන හේතුව කුමක්ද?', choices: {
+      START: 'කුඩා මැහුම් ව්‍යාපාරයක් ආරම්භ කිරීමට අවශ්‍යයි.', IMPROVE: 'දැනට මැහුම් ඇණවුම් භාරගන්නවා. ව්‍යාපාරය දියුණු කරගැනීමට අවශ්‍යයි.', LEARN: 'මට ප්‍රධාන වශයෙන් මැහුම් කුසලතා ඉගෙනගැනීමට අවශ්‍යයි.', CUSTOM: 'ඇඳුමක් මස්සවා ගැනීම හෝ නිෂ්පාදනයක් මිලදී ගැනීම ගැන විමසීමට අවශ්‍යයි.', UNSURE: 'තවමත් සොයා බලනවා. ආරම්භ කළ යුත්තේ කොතැනින්ද කියා දැනගැනීමට අවශ්‍යයි.' } },
+    { id: 'Q2', title: 'දැනට ඔබ සිටින තත්ත්වයට වඩාත් ගැලපෙන්නේ කුමක්ද?', choices: {
+      NEW: 'මම මැහුම් ඉගෙනගැනීම ආරම්භ කරන කෙනෙක්.', SKILL: 'මට මහන්න පුළුවන්. නමුත් මුදල් අය කර ඇණවුම් භාරගෙන නැහැ.', OCCASIONAL: 'මම ඉඳහිට මුදල් අය කර මැහුම් ඇණවුම් භාරගන්නවා.', REGULAR: 'මම මැහුම් ව්‍යාපාරයක් කරගෙන යනවා හෝ නිතිපතා ඇණවුම් භාරගන්නවා.', PREFER_NOT: 'මේ ගැන සඳහන් කිරීමට කැමති නැහැ.' } },
+    { id: 'Q3', title: 'ඔබට වැඩිපුරම සහාය අවශ්‍ය කුමන කරුණටද? එකක් තෝරන්න.', choices: {
+      RESOURCES: 'දැනට තිබෙන මුදල්, උපකරණ සහ දක්ෂතා භාවිතයෙන් ආරම්භ කිරීම.', PRODUCT: 'සුදුසු නිෂ්පාදනයක් තෝරාගෙන පාරිභෝගික ඉල්ලුම හඳුනාගැනීම.', FABRIC: 'රෙදි නාස්තිය අවම කර අමුද්‍රව්‍ය වියදම් පාලනය කිරීම.', PRICE: 'වියදම් ගණනය කර විකුණුම් මිලක් තීරණය කිරීම.', ORDERS: 'ඇණවුම් හොඳින් භාරදී නැවත ඇණවුම් ලැබෙන පාරිභෝගික සබඳතා ගොඩනැඟීම.', NOT_SURE: 'මට තවමත් පැහැදිලි නැහැ.' } },
+    { id: 'Q4', title: 'මේ අවස්ථාවේ ඔබ ඉගෙනගැනීමට කැමති කුමන ආකාරයෙන්ද?', choices: {
+      FREE: 'දැනට නොමිලේ වැඩමුළු සහ ප්‍රායෝගික පාඩම් හරහා.', SELF: 'තනිවම අනුගමනය කළ හැකි ක්‍රමානුකූල මාර්ගෝපදේශයක් හරහා.', GUIDED: 'පුද්ගලික මඟපෙන්වීම සහ මගේ වැඩ පිළිබඳ ප්‍රතිචාර සමඟ.', EXPLORE: 'මම තවමත් තීරණය කරමින් සිටිනවා.' } }
+  ];
+  function selectVideo(answers, customAttending = true) {
+    if (answers?.Q1 === 'CUSTOM' && customAttending === false) return null;
+    for (const q of questions) if (!Object.hasOwn(q.choices, answers[q.id])) throw new Error('INVALID_ANSWER');
+    if (answers.Q1 === 'CUSTOM') return customAttending === false ? null : 'V5';
+    if (answers.Q1 === 'LEARN') return 'V4';
+    if (answers.Q1 === 'UNSURE') return 'V5';
+    if (answers.Q1 === 'IMPROVE' || ['OCCASIONAL', 'REGULAR'].includes(answers.Q2)) return 'V3';
+    if (answers.Q1 === 'START' && answers.Q2 === 'SKILL') return 'V2';
+    return 'V1';
   }
-];
-
-// ── State ─────────────────────────────────────────────────────────────────────
-let state = {
-  isOpen: false,
-  phase: 'step1',
-  qIndex: 0,
-  answers: {},
-  multiVals: [],
-  lastRenderedQ: null
-};
-
-// ── App Logic ─────────────────────────────────────────────────────────────────
-window.Funnel = {
-  openQuiz: () => {
-    document.getElementById('quiz-overlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    state.isOpen = true;
-    window.Funnel.render();
-  },
-
-  closeQuiz: () => {
-    document.getElementById('quiz-overlay').style.display = 'none';
-    document.body.style.overflow = '';
-    state.isOpen = false;
-  },
-
-  getActiveQuestions: () => {
-    return QUIZ_QUESTIONS.filter(q =>
-      q.phase === state.phase && (!q.showIf || q.showIf(state.answers))
-    );
-  },
-
-  render: () => {
-    window.Funnel.updateProgressBar();
-    if (state.phase === 'result') { window.Funnel.renderResult(); return; }
-
-    const activeQ = window.Funnel.getActiveQuestions();
-    const currentQ = activeQ[state.qIndex];
-    const contentArea = document.getElementById('quiz-content-area');
-    const navBar = document.getElementById('quiz-nav');
-    const nextNavBtn = document.getElementById('btn-next-nav');
-    const prevBtn = document.getElementById('btn-prev');
-
-    if (prevBtn) {
-      prevBtn.style.visibility = state.qIndex === 0 ? 'hidden' : 'visible';
+  const transcripts = {
+    V1: 'ඔබට අවශ්‍ය ආරම්භ කරන්න හොඳ තැනක් හඳුනාගන්නයි. අලුත් උපකරණ හෝ අමුද්‍රව්‍ය සඳහා මුදල් වැය කරන්න කලින්, දැනට ඔබ සතුව තිබෙන දේ සහ තව ඉගෙනගත යුතු දේ හඳුනාගැනීම වැදගත්. මේ වැඩමුළුවේදී සම්පත්, නිෂ්පාදන, වියදම් සහ පාරිභෝගිකයන් ගැන මුල් ව්‍යාපාරික තීරණ සාකච්ඡා කරනවා. මෙය මූලික මැහුම් පුහුණුවක් වෙනුවට පැවැත්වෙන පාඨමාලාවක් නොවේ. ඔබේ ලියාපදිංචිය සම්පූර්ණයි. පහත බොත්තමෙන් WhatsApp ප්‍රජාවට එක්වී ඔබට පහසු වේලාවට ඡන්දය දෙන්න. වැඩමුළුවට සම්බන්ධ වන තොරතුරුත් එහි ලැබෙනවා.',
+    V2: 'ඔබට දැනටමත් මැහුම් හැකියාව තිබෙනවා. දැන් ඒ හැකියාවෙන් කුඩා ව්‍යාපාරයක් ආරම්භ කරන්න ඔබ කැමතියි. ඊළඟට වැදගත් වෙන්නේ සුදුසු එක නිෂ්පාදනයක් තෝරාගෙන, එය අවශ්‍ය කාටද සහ එය නිපදවීමට කොපමණ වියදමක් යනවාද කියා හඳුනාගැනීමයි. වැඩමුළුවේදී ඒ තීරණ රෙදි භාවිතය, මිල තීරණය කිරීම සහ මුල් ඇණවුම් භාරගැනීම සමඟ සම්බන්ධ කර බලනවා. ඔබේ ලියාපදිංචිය සම්පූර්ණයි. WhatsApp ප්‍රජාවට එක්වී ඔබට පහසු වේලාවට ඡන්දය දෙන්න. ඔබ ආරම්භ කිරීමට කැමති නිෂ්පාදනයක් ගැනත් සිතාගෙන එන්න.',
+    V3: 'ඔබ දැනටමත් මැහුම් ඇණවුම් භාරගන්න කෙනෙක්. අමුද්‍රව්‍ය වියදම් පාලනය කරන්න, මිල තීරණය කරන්න සහ ඇණවුම් හොඳින් භාරදෙන්න වඩා පැහැදිලි ක්‍රමයක් ඔබට අවශ්‍ය වෙන්න පුළුවන්. මේ වැඩමුළුවේදී ඒ ව්‍යාපාරික තීරණ සහ හොඳ සේවාවක් තුළින් පාරිභෝගික විශ්වාසය ගොඩනඟාගන්නා ආකාරය ගැන කතා කරනවා. මෑතකදී කළ ඇණවුමක් සහ එහිදී මුහුණ දුන් අපහසුතාවක් මතක් කරගෙන එන්න. පාඩම අතරතුර එය ඔබේම උදාහරණයක් ලෙස භාවිත කරන්න පුළුවන්. ඔබේ ලියාපදිංචිය සම්පූර්ණයි. WhatsApp ප්‍රජාවට එක්වී පහසු වේලාවට ඡන්දය දෙන්න.',
+    V4: 'ඔබට ප්‍රධාන වශයෙන් අවශ්‍ය මැහුම් ඉගෙනගැනීමට බව අපි තේරුම් ගත්තා. මේ වැඩමුළුවේ අවධානය යොමුවෙන්නේ නිෂ්පාදන තෝරාගැනීම, රෙදි හොඳින් භාවිත කිරීම, වියදම් ගණනය කිරීම සහ පාරිභෝගිකයන්ට සේවය කිරීම වැනි ව්‍යාපාරික කරුණු වෙතයි. මෙය පියවරෙන් පියවර මැහුම් ක්‍රම උගන්වන පන්තියක් නොවේ. මැහුම් හැකියාව කුඩා ව්‍යාපාරයකට සම්බන්ධ කරගන්නේ කොහොමද කියා දැනගන්න කැමති නම් ඔබට සහභාගී වෙන්න පුළුවන්. ඔබේ ලියාපදිංචිය සම්පූර්ණයි. WhatsApp ප්‍රජාවට එක්වී ඔබට පහසු වේලාවට ඡන්දය දෙන්න.',
+    V5: 'ඔබට අවශ්‍ය දේ ගැන තවමත් සොයා බලමින් සිටිනවා නම් ඒක ගැටලුවක් නැහැ. මේ නොමිලේ වැඩමුළුවෙන් කුඩා මැහුම් ව්‍යාපාරයක ප්‍රායෝගික තීරණ ගැන හඳුන්වා දෙනවා. ගාස්තු අය කරන වැඩසටහනකට බැඳෙන්නේ නැතිව ඔබට මේ අදහස් ගැන ඉගෙනගන්න පුළුවන්. ඇඳුමක් මස්සවා ගැනීම හෝ නිෂ්පාදනයක් ගැන විමසීමක් තිබෙනවා නම් එය වෙනම සලකා බලන්න පුළුවන්. ඔබේ වැඩමුළු ලියාපදිංචිය සම්පූර්ණයි. WhatsApp ප්‍රජාවට එක්වී ඔබට පහසු වේලාවට ඡන්දය දෙන්න. සම්බන්ධ වීමේ තොරතුරුත් එහි ලැබෙනවා.'
+  };
+  const state = { screen: 'details', step: 0, answers: {}, details: { name: '', phone: '', email: '', dial: '+94', workshop_contact_acknowledgement: false, marketing_opt_in: false }, registration_id: null, session_token: null, custom_attending: null, enquiry_text: '', enquiry_consent: false, requests: [], membership: 'unknown', pending: false, error: '', errors: {}, saved: false, video: null };
+  const operations = new Map();
+  const emitted = new Set();
+  let returnFocus, oldOverflow, opened = false, renderedKey = '';
+  const $ = id => document.getElementById(id);
+  const escape = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  const uid = () => window.crypto?.randomUUID?.() || `r${Date.now()}${Math.random().toString(36).slice(2)}`;
+  const safeUrl = v => { if (typeof v !== 'string' || !v.trim()) return ''; try { const u = new URL(v, location.href); return ['https:', 'http:'].includes(u.protocol) ? u.href : ''; } catch { return ''; } };
+  const community = () => safeUrl(config.communityUrl || config.community_url || '');
+  const help = () => safeUrl(config.helpUrl || config.help_url || '');
+  const timeConfirmed = () => (event.timeStatus || config.time_status) === 'confirmed';
+  const dateText = () => event.dateLabel || config.dateLabel || '2026 නොවැම්බර් 14';
+  const timeText = () => timeConfirmed() ? (event.timeLabel || config.timeLabel || 'තහවුරු කළ වේලාව ලබාදී නැත') : 'වේලාව WhatsApp ප්‍රජාවේ ඡන්ද විමසීමෙන් පසු තහවුරු කෙරේ.';
+  function analytics(name, data = {}, once = true) {
+    const key = `${name}:${data.step || ''}:${name === 'registration_start' ? 'session' : state.registration_id || 'open'}`;
+    if (once && emitted.has(key)) return;
+    emitted.add(key);
+    window.dispatchEvent(new CustomEvent('workshop:analytics', { detail: { event: name, event_id: eventId, preview, ...data } }));
+  }
+  async function previewTransport(payload) {
+    // This local adapter deliberately makes no network requests.
+    return { ok: true, registration_id: state.registration_id || `preview-${uid()}`, session_token: state.session_token || uid(), status: ({ start: 'started', answer: 'quiz_in_progress', complete: 'complete', enquiry: 'enquiry_only' })[payload.action] || 'saved', video_id: payload.action === 'complete' ? selectVideo(payload.answers, payload.custom_attending) : undefined };
+  }
+  async function request(action, extra = {}) {
+    const data = { action, event_id: eventId, ...(state.registration_id && action !== 'start' ? { registration_id: state.registration_id, session_token: state.session_token } : {}), ...extra };
+    if (data.custom_attending === null || data.custom_attending === undefined) delete data.custom_attending;
+    const signature = JSON.stringify(data);
+    let op = operations.get(signature);
+    if (!op) { op = { ...data, request_id: uid() }; operations.set(signature, op); }
+    let last;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), config.requestTimeoutMs || 15000);
+      try {
+        let result;
+        if (typeof window.WORKSHOP_TRANSPORT === 'function') result = await Promise.race([window.WORKSHOP_TRANSPORT(op, { signal: controller.signal, preview }), new Promise((_, reject) => controller.signal.addEventListener('abort', () => reject(new Error('TIMEOUT')), { once: true }))]);
+        else if (preview) result = await previewTransport(op);
+        else {
+          const endpoint = safeUrl(config.endpoint || config.apiEndpoint || '');
+          if (!endpoint) throw new Error('ENDPOINT_NOT_CONFIGURED');
+          const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(op), signal: controller.signal, credentials: 'omit' });
+          if (!response.ok) throw new Error(`HTTP_${response.status}`);
+          result = await response.json();
+        }
+        if (!result || result.ok !== true) {
+          const error = new Error(result?.error?.code || 'SAVE_FAILED'); error.backend = true; throw error;
+        }
+        return result;
+      } catch (error) { last = error; if (error.backend || error.message === 'ENDPOINT_NOT_CONFIGURED') break; }
+      finally { clearTimeout(timer); }
     }
-
-    const introText = document.getElementById('quiz-intro-text');
-    if (introText) {
-      const showIntro = ['name', 'phone', 'email', 'country', 'district'].includes(currentQ.field);
-      introText.style.display = showIntro ? 'block' : 'none';
+    throw last || new Error('SAVE_FAILED');
+  }
+  function generalError(error) {
+    return error.message === 'ENDPOINT_NOT_CONFIGURED' ? 'ලියාපදිංචි සේවාව තවම සකසා නැත. ඔබේ තොරතුරු යවා නැත. කරුණාකර පසුව නැවත උත්සාහ කරන්න.' : 'සුරැකීමට නොහැකි විය. ඔබ ඇතුළත් කළ තොරතුරු මෙහි තවමත් ඇත. කරුණාකර නැවත උත්සාහ කරන්න.';
+  }
+  async function save(work) {
+    if (state.pending) return;
+    state.pending = true; state.error = ''; setPending(true);
+    try { await work(); } catch (error) { state.error = generalError(error); }
+    finally { state.pending = false; render(); }
+  }
+  function setPending(value) {
+    $('quiz-content-area')?.querySelectorAll('button,input,select,textarea').forEach(el => el.disabled = value);
+    $('quiz-content-area')?.setAttribute('aria-busy', String(value));
+    const status = $('flow-status'); if (status) status.textContent = value ? 'සුරකිමින් පවතී…' : '';
+  }
+  function captureDetails() {
+    for (const key of ['name', 'phone', 'email', 'dial']) if ($(`flow-${key}`)) state.details[key] = $(`flow-${key}`).value;
+    for (const key of ['workshop_contact_acknowledgement', 'marketing_opt_in']) if ($(`flow-${key}`)) state.details[key] = $(`flow-${key}`).checked;
+  }
+  function normalPhone() {
+    const raw = state.details.phone.trim().replace(/[\s().-]/g, '');
+    if (raw.startsWith('+')) return raw;
+    return state.details.dial + raw.replace(/^0/, '');
+  }
+  function validateDetails() {
+    const d = state.details, errors = {};
+    if (d.name.trim().length < 2 || !/\p{L}/u.test(d.name)) errors.name = 'කරුණාකර ඔබේ සම්පූර්ණ නම ඇතුළත් කරන්න.';
+    if (!/^\+[1-9]\d{7,14}$/.test(normalPhone())) errors.phone = 'කරුණාකර නිවැරදි WhatsApp අංකයක් ඇතුළත් කර රටේ කේතය පරීක්ෂා කරන්න.';
+    if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim())) errors.email = 'කරුණාකර නිවැරදි විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න.';
+    if (!d.workshop_contact_acknowledgement) errors.workshop_contact_acknowledgement = 'ඉදිරියට යාමට වැඩමුළුව පිළිබඳ පණිවිඩ සඳහා එකඟතාව තහවුරු කරන්න.';
+    state.errors = errors; return Object.keys(errors).length === 0;
+  }
+  const checked = yes => yes ? ' checked' : '';
+  const errorFor = key => state.errors[key] ? `<span class="cf-err" id="error-${key}">${escape(state.errors[key])}</span>` : '';
+  const attrs = key => state.errors[key] ? ` aria-invalid="true" aria-describedby="error-${key}"` : '';
+  const check = (id, label, value) => `<label class="flow-check"><input id="flow-${id}" type="checkbox"${checked(value)}${attrs(id)}><span>${label}</span></label>${errorFor(id)}`;
+  const action = (id, text, secondary = false) => `<button id="${id}" type="button" class="${secondary ? 'btn-back' : 'quiz-ok-btn'}">${text}</button>`;
+  function resource(id, label, url, secondary = false) {
+    const classes = secondary ? 'btn-back flow-resource-button' : 'btn btn-primary flow-resource-button';
+    return url ? `<a id="${id}" class="${classes}" href="${escape(url)}" target="_blank" rel="noopener">${label}</a>` : `<button id="${id}" class="${classes}" type="button" data-resource="${id}">${label}</button><span class="flow-resource-status" id="${id}-status" role="status" aria-live="polite"></span>`;
+  }
+  const routeLabels = { V1: 'ආරම්භයට මඟපෙන්වීමක්', V2: 'මැහුම් හැකියාවෙන් ව්‍යාපාරයකට', V3: 'දැනට කරන ඇණවුම් දියුණු කරගනිමු', V4: 'මැහුම් ඉගෙනීමට කැමති ඔබට', V5: 'ඔබට ගැලපෙන ආරම්භයක් සොයමු' };
+  function detailsView() {
+    const privacy = safeUrl(config.privacyUrl || config.privacy_url || '');
+    return `<h2 class="quiz-q-title" tabindex="-1">මුලින්ම ඔබේ මූලික තොරතුරු ලබා දෙන්න.</h2>
+      <p class="flow-note">කෙටි ප්‍රශ්න හතරකින් ඔබ ඉගෙනගැනීමට කැමති දේ හඳුනාගනිමු. මෙහි හරි හෝ වැරදි පිළිතුරු නැත.</p>
+      <form id="flow-details" class="flow-form" novalidate>
+      <label class="flow-field" for="flow-name">සම්පූර්ණ නම<input class="quiz-text-input" id="flow-name" name="name" autocomplete="name" maxlength="120" value="${escape(state.details.name)}"${attrs('name')}>${errorFor('name')}</label>
+      <label class="flow-field" for="flow-phone">WhatsApp දුරකථන අංකය</label><div class="flow-phone-row"><label for="flow-dial">රටේ කේතය</label><select id="flow-dial" class="quiz-text-input" aria-label="රටේ දුරකථන කේතය">${[['+94','ශ්‍රී ලංකාව +94'],['+91','ඉන්දියාව +91'],['+971','එක්සත් අරාබි එමීර් +971'],['+974','කටාර් +974'],['+966','සවුදි අරාබිය +966'],['+965','කුවේට් +965'],['+968','ඕමාන් +968'],['+44','එක්සත් රාජධානිය +44'],['+61','ඕස්ට්‍රේලියාව +61'],['+1','ඇමෙරිකාව / කැනඩාව +1']].map(([v,l])=>`<option value="${v}"${state.details.dial===v?' selected':''}>${l}</option>`).join('')}</select><input class="quiz-text-input" id="flow-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" value="${escape(state.details.phone)}"${attrs('phone')}></div>${errorFor('phone')}<p class="flow-note">වෙනත් රටක අංකයක් නම් + සහ රටේ කේතය සමඟ සම්පූර්ණ අංකය ඇතුළත් කරන්න.</p>
+      <label class="flow-field" for="flow-email">විද්‍යුත් තැපැල් ලිපිනය — අත්‍යවශ්‍ය නොවේ<input class="quiz-text-input" id="flow-email" name="email" type="email" autocomplete="email" maxlength="254" value="${escape(state.details.email)}"${attrs('email')}>${errorFor('email')}</label>
+      <p class="flow-note">මෙම වැඩමුළුව කළමනාකරණය කිරීමට සහ ඔබේ ඉගෙනුම් අවශ්‍යතා හඳුනාගැනීමට ඔබේ තොරතුරු සහ පිළිතුරු භාවිත කරමු.</p>${resource('flow-privacy','පෞද්ගලිකත්ව නිවේදනය කියවන්න',privacy,true)}
+      ${check('workshop_contact_acknowledgement','මෙම වැඩමුළුවේ ලියාපදිංචිය කළමනාකරණය කිරීමට සහ ලියාපදිංචිය, සහභාගී වීම හා මතක් කිරීම් පිළිබඳ අදාළ පණිවිඩ යැවීමට මගේ තොරතුරු භාවිත කිරීමට මම එකඟ වෙමි.',state.details.workshop_contact_acknowledgement)}
+      ${check('marketing_opt_in','ඉදිරියේදී Su Collection වෙතින් ඉගෙනුම් අවස්ථා සහ නිෂ්පාදන පිළිබඳ දැනුවත් කිරීම් ලබාගැනීමටත් මම කැමතියි. (අත්‍යවශ්‍ය නොවේ)',state.details.marketing_opt_in)}
+      <button class="quiz-ok-btn" type="submit">ප්‍රශ්න වෙත යන්න</button></form>`;
+  }
+  function questionView() {
+    const q = questions[state.step];
+    return `<h2 class="quiz-q-title" tabindex="-1">${q.title}</h2><p class="flow-note">එක පිළිතුරක් තෝරා ඉදිරියට යන්න.</p><div class="quiz-choices" role="group" aria-label="${q.title}">${Object.entries(q.choices).map(([code,label])=>`<button class="quiz-choice${state.answers[q.id]===code?' selected':''}" type="button" data-answer="${code}" aria-pressed="${state.answers[q.id]===code}"><span class="quiz-choice-label"><span class="sin">${label}</span></span></button>`).join('')}</div><div class="flow-actions">${action('flow-back','ආපසු',true)}${action('flow-next',state.step===3?'මගේ නොමිලේ ලියාපදිංචිය සම්පූර්ණ කරන්න':'ඉදිරියට')}</div>`;
+  }
+  function customView() {
+    return `<h2 class="quiz-q-title" tabindex="-1">මෙම වැඩමුළුවේ අවධානය මැහුම් ව්‍යාපාරයක මූලික කරුණු පිළිබඳවයි. ඔබ වැඩමුළුවටත් සහභාගී වීමට කැමතිද?</h2><div class="quiz-choices"><button class="quiz-choice" id="flow-attend">ඔව්, වැඩමුළු ලියාපදිංචිය ඉදිරියට ගෙන යන්න.</button><button class="quiz-choice" id="flow-enquiry-only">මට අවශ්‍ය මැහුම් සේවාවක් හෝ නිෂ්පාදනයක් ගැන විමසීමට පමණයි.</button></div>${action('flow-back','ආපසු',true)}`;
+  }
+  function enquiryView() {
+    return `<h2 class="quiz-q-title" tabindex="-1">ඔබ විමසීමට කැමති දේ කෙටියෙන් සඳහන් කරන්න.</h2><p class="flow-note">මෙය වැඩමුළු ලියාපදිංචියෙන් වෙනම විමසීමකි.</p><label for="flow-enquiry">ඔබේ විමසීම</label><textarea id="flow-enquiry" class="quiz-text-input" rows="4" maxlength="2000">${escape(state.enquiry_text)}</textarea>${check('enquiry_consent','මෙම විමසීමට පිළිතුරු ලබාදීම සඳහා මගේ තොරතුරු භාවිත කිරීමට මම එකඟ වෙමි.',state.enquiry_consent)}<div class="flow-actions">${action('flow-back','ආපසු',true)}${action('flow-send-enquiry','මගේ විමසීම යවන්න')}</div>`;
+  }
+  function resultView() {
+    const id = state.video, asset = config.videos?.[id] || {};
+    const src = safeUrl(asset.src || '');
+    const captions = safeUrl(asset.captions || '');
+    const focus = state.answers.Q3 === 'NOT_SURE' ? 'ප්‍රයෝජනවත් ආරම්භක තැනක් සොයාගැනීම.' : questions[2].choices[state.answers.Q3];
+    const transcript = asset.transcript || transcripts[id];
+    const body = timeConfirmed() ? transcript.replace(/WhatsApp ප්‍රජාවට එක්වී[^.]*ඡන්දය දෙන්න\./g, 'අවසන් විස්තර සහ සම්බන්ධ වන උපදෙස් සඳහා WhatsApp ප්‍රජාවට එක්වන්න.') : transcript;
+    return `<h2 class="quiz-q-title" tabindex="-1">${preview ? 'පෙරදසුන් ලියාපදිංචිය සම්පූර්ණයි.' : 'නොමිලේ වැඩමුළුව සඳහා ඔබේ ලියාපදිංචිය සම්පූර්ණයි.'}</h2><p class="flow-date">${escape(dateText())}<br>${escape(timeText())}</p>
+      <section class="flow-result-section"><h3>වැඩමුළු ප්‍රජාවට එක්වන්න</h3><p>ලියාපදිංචිය සම්පූර්ණයි. WhatsApp ප්‍රජාවට එක්වීම වෙනම පියවරකි. එයට එක්වීමට පෙර වීඩියෝව නැරඹීම අනිවාර්ය නැත.</p>${resource('flow-community',timeConfirmed()?'WhatsApp ප්‍රජාවට එක්වන්න':'WhatsApp ප්‍රජාවට එක්වී පහසු වේලාවට ඡන්දය දෙන්න',community())}</section>
+      <section class="flow-result-section"><h3>ඔබ තෝරාගත් අවධානය</h3><p>${escape(focus)}</p><p class="flow-note">වැඩමුළුවේ සඳහන් මාතෘකා පහ සාකච්ඡා කෙරේ. ඔබේ පිළිතුර ඔබේ අවශ්‍යතා හඳුනාගැනීමට උපකාරී වේ. මෙය පුද්ගලික හෝ ඔබ වෙනුවෙන් පමණක් සකස් කළ පාඩමක් නොවේ.</p>${src ? `<video class="flow-video" id="flow-video" controls playsinline preload="none"${safeUrl(asset.poster)?` poster="${escape(safeUrl(asset.poster))}"`:''}><source src="${escape(src)}">${captions?`<track kind="captions" src="${escape(captions)}" srclang="si" label="සිංහල" default>`:''}</video><p id="flow-video-error" class="flow-note" hidden>වීඩියෝව පූරණය කළ නොහැකි විය. පහත පෙළ කියවන්න හෝ WhatsApp බොත්තම භාවිත කරන්න.</p>` : `<button class="flow-video-placeholder" id="flow-video-placeholder" type="button" data-resource="flow-video-placeholder" aria-label="වීඩියෝව පසුව එක් කෙරේ"><span class="flow-video-play" aria-hidden="true">▶</span><span class="flow-video-label">${routeLabels[id]}</span><span>වීඩියෝව පසුව එක් කෙරේ</span></button><span class="flow-resource-status" id="flow-video-placeholder-status" role="status"></span>`}<details id="flow-transcript" open><summary>පණිවිඩය කියවන්න</summary><p>${escape(body)}</p></details></section>
+      <section class="flow-result-section"><h3>ප්‍රජාවට එක්වීම</h3><p class="flow-note">බොත්තම එබීමෙන් පමණක් සාමාජිකත්වය තහවුරු නොවේ. පහත ප්‍රකාශය ඔබ විසින් ලබාදෙන තොරතුරක් ලෙස පමණක් සුරැකේ.</p>${action('flow-membership',state.membership==='self_reported'?'මගේ ප්‍රකාශය සුරැකී ඇත':'මම දැනටමත් ප්‍රජාවේ සිටිමි',true)}${resource('flow-help','ප්‍රජාවට එක්වීමට මට උදව් අවශ්‍යයි',help(),true)}<p class="flow-note">${timeConfirmed()?'සජීවී සහභාගීත්වය පිළිබඳ වැඩි විස්තර ප්‍රජාවේ දැනුම් දෙනු ලැබේ.':'සජීවීව සහභාගී වීමේ කැමැත්ත වේලාව තහවුරු කළ පසු විමසනු ලැබේ.'}</p></section>
+      <section class="flow-result-section"><h3>ඔබට අමතර තොරතුරු අවශ්‍යද?</h3><p class="flow-note">මෙය අත්‍යවශ්‍ය නොවන අතර වැඩමුළුවට සහභාගී වීමට බලපාන්නේ නැත. ඔබ කලින් තෝරාගත් ඉගෙනුම් කැමැත්තෙන් මෙම ඉල්ලීම් ස්වයංක්‍රීයව සක්‍රිය නොවේ.</p>${check('ebook','කරුණාකර ඊ-පොතේ අන්තර්ගතය සහ මිලදී ගැනීමේ තොරතුරු මට එවන්න.',state.requests.includes('ebook'))}${check('mentorship','පුද්ගලික ව්‍යාපාර මඟපෙන්වීමේ වැඩසටහන පිළිබඳ තොරතුරු ලබාදීමට කරුණාකර මා අමතන්න.',state.requests.includes('mentorship'))}${check('none','දැනට නිෂ්පාදන පිළිබඳ තොරතුරු අවශ්‍ය නැහැ.',state.requests.includes('none'))}${action('flow-preferences','මගේ කැමැත්ත සුරකින්න')}<p class="flow-note">මෙය කිසිවක් මිලදී ගැනීමක් හෝ ගාස්තු අය කරන වැඩසටහනකට ඇතුළත් වීමක් නොවේ.</p><p id="flow-pref-status" role="status"></p></section>`;
+  }
+  function render() {
+    const container = $('quiz-content-area'); if (!container) return;
+    $('quiz-intro-text').style.display = 'none';
+    $('quiz-nav').style.display = 'none';
+    const result = state.screen === 'result';
+    const labels = { details: 'ඔබේ තොරතුරු', custom: 'වැඩමුළුවට සහභාගී වීම', enquiry: 'ඔබේ විමසීම', enquiry_done: 'විමසීම ලැබී ඇත', result: 'ලියාපදිංචිය සම්පූර්ණයි' };
+    $('quiz-phase-label').textContent = state.screen === 'question' ? `ප්‍රශ්න 4න් ${state.step + 1}` : labels[state.screen] || '';
+    $('quiz-progress-fill').style.width = result ? '100%' : state.screen === 'question' ? `${state.step * 25}%` : '0%';
+    let view;
+    switch (state.screen) {
+      case 'question': view = questionView(); break;
+      case 'custom': view = customView(); break;
+      case 'enquiry': view = enquiryView(); break;
+      case 'enquiry_done': view = `<h2 class="quiz-q-title" tabindex="-1">${preview?'පෙරදසුන් විමසීම සුරැකී ඇත.':'ඔබේ විමසීම ලැබී ඇත.'}</h2><p>ඔබ ලබාදුන් සම්බන්ධතා තොරතුරු හරහා කණ්ඩායම පිළිතුරු ලබාදෙනු ඇත. මෙය තහවුරු කළ ඇණවුමක් හෝ වැඩමුළු ලියාපදිංචියක් නොවේ.</p>`; break;
+      case 'result': view = resultView(); break;
+      default: view = detailsView();
     }
-
-    // Check if it's the last question to change the "Next" button to "Submit"
-    let nextBtnText = "ඉදිරියට / Next";
-    let isLastQ = (state.qIndex === activeQ.length - 1);
-    if (isLastQ) {
-      nextBtnText = "Submit";
-    }
-
-    if (nextNavBtn) {
-      nextNavBtn.style.display = 'none';
-      nextNavBtn.innerHTML = nextBtnText;
-      if (isLastQ) {
-        nextNavBtn.style.background = '#000';
-        nextNavBtn.style.color = '#fff';
-      } else {
-        nextNavBtn.style.background = '';
-        nextNavBtn.style.color = '';
-      }
-    }
-
-    const isSameQ = state.lastRenderedQ === currentQ.id || !state.lastRenderedQ;
-    state.lastRenderedQ = currentQ.id;
-
-    if (!isSameQ) {
-      const panel = document.getElementById('quiz-main-panel');
-      if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    contentArea.innerHTML = '';
-
-    if (currentQ.type === 'single-choice') {
-      navBar.style.display = 'flex';
-      const hasAnswer = state.answers[currentQ.field] !== undefined;
-      if (hasAnswer && nextNavBtn) nextNavBtn.style.display = 'inline-flex';
-
-      let html = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}">
-          <h2 class="quiz-q-title">${currentQ.title}</h2>
-          <div class="quiz-choices">
-      `;
-      currentQ.choices.forEach(c => {
-        const isSel = state.answers[currentQ.field] === c.value;
-        const vStr = typeof c.value === 'string' ? `'${c.value}'` : c.value;
-        html += `
-          <button class="quiz-choice ${isSel ? 'selected' : ''}"
-            onclick="window.Funnel.selectSingle('${currentQ.field}', ${vStr})">
-            <span class="quiz-choice-key">${c.key}</span>
-            <span class="quiz-choice-label">${c.label}</span>
-          </button>
-        `;
+    container.innerHTML = `<div class="quiz-question${result?' quiz-result':''}">${preview?'<p class="flow-banner" role="note">පෙරදසුන පමණයි — දත්ත මෙම පිටුව තුළ පමණක් අනුකරණය කෙරේ. සැබෑ ලියාපදිංචියක් හෝ විමසීමක් යවා නැත.</p>':''}${view}<div class="flow-errors" id="flow-errors" role="alert" tabindex="-1">${escape(state.error)}</div><div class="flow-status" id="flow-status" role="status" aria-live="polite"></div></div>`;
+    const nextKey = `${state.screen}:${state.step}`;
+    if (nextKey !== renderedKey) { $('quiz-main-panel').scrollTop = 0; renderedKey = nextKey; }
+    bind(); setPending(state.pending);
+    if (state.error) $('flow-errors').focus?.();
+    else container.querySelector('.quiz-q-title')?.focus({ preventScroll: true });
+  }
+  function bind() {
+    const on = (id, eventName, fn) => $(id)?.addEventListener(eventName, fn);
+    on('flow-details','input',captureDetails); on('flow-details','change',captureDetails);
+    on('flow-details','submit', e => { e.preventDefault(); captureDetails(); if (!validateDetails()) { render(); $('quiz-content-area').querySelector('[aria-invalid="true"]')?.focus(); return; } save(async()=>{
+      const source = new URLSearchParams(location.search).get('source');
+      const allow = config.sourceCodes || config.approvedSourceCodes || ['direct'];
+      const details = { name: state.details.name.trim(), phone: normalPhone(), email: state.details.email.trim(), workshop_contact_acknowledgement: true, marketing_opt_in: state.details.marketing_opt_in, source_code: allow.includes(source)?source:'direct', test_flag: preview || config.testFlag === true };
+      const response = await request('start',{details});
+      if (!response.registration_id || !response.session_token || response.status !== 'started') throw new Error('INVALID_START_ACK');
+      state.registration_id = response.registration_id; state.session_token = response.session_token; state.saved = true; state.screen = 'question';
+      analytics('details_saved');
+    }); });
+    $('quiz-content-area').querySelectorAll('[data-answer]').forEach(button => button.addEventListener('click',()=>{
+      const q = questions[state.step]; state.answers[q.id] = button.dataset.answer; state.error = '';
+      if (q.id === 'Q1' && state.answers.Q1 !== 'CUSTOM') state.custom_attending = null;
+      $('quiz-content-area').querySelectorAll('[data-answer]').forEach(b=>{ const selected = b===button; b.classList.toggle('selected',selected); b.setAttribute('aria-pressed',String(selected)); });
+    }));
+    on('flow-next','click',()=>{
+      const q = questions[state.step]; if (!state.answers[q.id]) { state.error='ඉදිරියට යාමට කරුණාකර පිළිතුරක් තෝරන්න.'; render(); return; }
+      save(async()=>{
+        await request('answer',{answers:{...state.answers},custom_attending:state.custom_attending});
+        analytics('quiz_step_complete',{step:q.id});
+        if (state.step===0 && state.answers.Q1==='CUSTOM') state.screen='custom';
+        else if (state.step<3) state.step++;
+        else {
+          const response = await request('complete',{answers:{...state.answers},custom_attending:state.custom_attending});
+          if (response.status!=='complete') throw new Error('INVALID_COMPLETE_ACK');
+          const expected = selectVideo(state.answers,state.custom_attending);
+          if (response.video_id && response.video_id!==expected) throw new Error('INVALID_ROUTE_ACK');
+          state.video = expected; state.screen='result'; analytics('registration_complete'); analytics('branch_preview_shown',{video_id:expected});
+        }
       });
-      html += `</div></div>`;
-      contentArea.innerHTML = html;
-    }
-    else if (currentQ.type === 'multi-select') {
-      navBar.style.display = 'flex';
-      if (!state.multiVals.length && state.answers[currentQ.field]) {
-        state.multiVals = [...state.answers[currentQ.field]];
-      }
-      let html = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}">
-          <h2 class="quiz-q-title">${currentQ.title}</h2>
-          <div class="quiz-choices multi-select-choices">
-      `;
-      currentQ.choices.forEach(c => {
-        const isSel = state.multiVals.includes(c.value);
-        html += `
-          <button class="quiz-choice ${isSel ? 'selected' : ''}"
-            onclick="window.Funnel.toggleMulti('${c.value}', '${currentQ.field}')">
-            <span class="quiz-choice-key multi-check">${c.key}</span>
-            <span class="quiz-choice-label">${c.label}</span>
-          </button>
-        `;
-      });
-      html += `</div>
-        <button class="quiz-ok-btn" onclick="window.Funnel.commitMulti('${currentQ.field}')"
-          ${state.multiVals.length === 0 ? 'disabled' : ''} style="${isLastQ ? 'background:#000;color:#fff;' : ''}">
-          ${isLastQ ? 'Submit' : 'OK'}
-        </button>
-      </div>`;
-      contentArea.innerHTML = html;
-    }
-    else if (currentQ.type === 'country-select' || currentQ.type === 'district-select') {
-      navBar.style.display = state.qIndex === 0 ? 'none' : 'flex';
-      const existing = state.answers[currentQ.field] || '';
-      const hasSelection = existing.trim().length > 0;
-
-      let optionsHtml = '';
-      if (currentQ.type === 'country-select') {
-        optionsHtml = `
-          <option value="" disabled selected>රට තෝරන්න / Select Country</option>
-          <option value="Sri Lanka">ශ්‍රී ලංකාව / Sri Lanka</option>
-          <option value="Afghanistan">ඇෆ්ගනිස්ථානය / Afghanistan</option>
-          <option value="Albania">ඇල්බේනියාව / Albania</option>
-          <option value="Algeria">ඇල්ජීරියාව / Algeria</option>
-          <option value="Andorra">ඇන්ඩෝරාව / Andorra</option>
-          <option value="Angola">ඇන්ගෝලාව / Angola</option>
-          <option value="Antigua and Barbuda">ඇන්ටිගුවා සහ බාබියුඩා / Antigua and Barbuda</option>
-          <option value="Argentina">ආර්ජන්ටිනාව / Argentina</option>
-          <option value="Armenia">ආර්මේනියාව / Armenia</option>
-          <option value="Australia">ඕස්ට්‍රේලියාව / Australia</option>
-          <option value="Austria">ඔස්ට්‍රියාව / Austria</option>
-          <option value="Azerbaijan">අසර්බයිජානය / Azerbaijan</option>
-          <option value="Bahamas">බහමාස් / Bahamas</option>
-          <option value="Bahrain">බහරේන් / Bahrain</option>
-          <option value="Bangladesh">බංග්ලාදේශය / Bangladesh</option>
-          <option value="Barbados">බාබඩෝස් / Barbados</option>
-          <option value="Belarus">බෙලරුස් / Belarus</option>
-          <option value="Belgium">බෙල්ජියම / Belgium</option>
-          <option value="Belize">බෙලීස් / Belize</option>
-          <option value="Benin">බෙනින් / Benin</option>
-          <option value="Bhutan">භූතානය / Bhutan</option>
-          <option value="Bolivia">බොලිවියාව / Bolivia</option>
-          <option value="Bosnia and Herzegovina">බොස්නියාව සහ හර්සගොවිනාව / Bosnia and Herzegovina</option>
-          <option value="Botswana">බොට්ස්වානා / Botswana</option>
-          <option value="Brazil">බ්‍රසීලය / Brazil</option>
-          <option value="Brunei">බෲනායි / Brunei</option>
-          <option value="Bulgaria">බල්ගේරියාව / Bulgaria</option>
-          <option value="Burkina Faso">බුර්කිනා ෆාසෝ / Burkina Faso</option>
-          <option value="Burundi">බුරුන්ඩි / Burundi</option>
-          <option value="Cabo Verde">කේප් වර්ඩ් / Cabo Verde</option>
-          <option value="Cambodia">කාම්බෝජය / Cambodia</option>
-          <option value="Cameroon">කැමරූන් / Cameroon</option>
-          <option value="Canada">කැනඩාව / Canada</option>
-          <option value="Central African Republic">මධ්‍යම අප්‍රිකානු ජනරජය / Central African Republic</option>
-          <option value="Chad">චැඩ් / Chad</option>
-          <option value="Chile">චිලී / Chile</option>
-          <option value="China">චීනය / China</option>
-          <option value="Colombia">කොලොම්බියාව / Colombia</option>
-          <option value="Comoros">කොමරෝස් / Comoros</option>
-          <option value="Congo (Congo-Brazzaville)">කොංගෝව / Congo (Congo-Brazzaville)</option>
-          <option value="Costa Rica">කොස්ටාරිකා / Costa Rica</option>
-          <option value="Croatia">ක්‍රොඒෂියාව / Croatia</option>
-          <option value="Cuba">කියුබාව / Cuba</option>
-          <option value="Cyprus">සයිප්‍රසය / Cyprus</option>
-          <option value="Czechia (Czech Republic)">චෙක් ජනරජය / Czechia</option>
-          <option value="Democratic Republic of the Congo">කොංගෝ ප්‍රජාතන්ත්‍රවාදී ජනරජය / DR Congo</option>
-          <option value="Denmark">ඩෙන්මාර්කය / Denmark</option>
-          <option value="Djibouti">ජිබුටි / Djibouti</option>
-          <option value="Dominica">ඩොමිනිකා / Dominica</option>
-          <option value="Dominican Republic">ඩොමිනිකන් ජනරජය / Dominican Republic</option>
-          <option value="Ecuador">ඉක්වදෝරය / Ecuador</option>
-          <option value="Egypt">ඊජිප්තුව / Egypt</option>
-          <option value="El Salvador">එල් සැල්වදෝරය / El Salvador</option>
-          <option value="Equatorial Guinea">සමක ගිනියාව / Equatorial Guinea</option>
-          <option value="Eritrea">එරිත්‍රියාව / Eritrea</option>
-          <option value="Estonia">එස්තෝනියාව / Estonia</option>
-          <option value="Eswatini (fmr. Swaziland)">එස්වාටිනි / Eswatini</option>
-          <option value="Ethiopia">ඉතියෝපියාව / Ethiopia</option>
-          <option value="Fiji">ෆීජි / Fiji</option>
-          <option value="Finland">ෆින්ලන්තය / Finland</option>
-          <option value="France">ප්‍රංශය / France</option>
-          <option value="Gabon">ගැබොන් / Gabon</option>
-          <option value="Gambia">ගැම්බියාව / Gambia</option>
-          <option value="Georgia">ජෝර්ජියාව / Georgia</option>
-          <option value="Germany">ජර්මනිය / Germany</option>
-          <option value="Ghana">ඝානාව / Ghana</option>
-          <option value="Greece">ග්‍රීසිය / Greece</option>
-          <option value="Grenada">ග්‍රෙනේඩා / Grenada</option>
-          <option value="Guatemala">ග්වාතමාලාව / Guatemala</option>
-          <option value="Guinea">ගිනියාව / Guinea</option>
-          <option value="Guinea-Bissau">ගිනියා-බිසව් / Guinea-Bissau</option>
-          <option value="Guyana">ගයනාව / Guyana</option>
-          <option value="Haiti">හයිටි / Haiti</option>
-          <option value="Honduras">හොන්ඩුරාස් / Honduras</option>
-          <option value="Hungary">හංගේරියාව / Hungary</option>
-          <option value="Iceland">අයිස්ලන්තය / Iceland</option>
-          <option value="India">ඉන්දියාව / India</option>
-          <option value="Indonesia">ඉන්දුනීසියාව / Indonesia</option>
-          <option value="Iran">ඉරානය / Iran</option>
-          <option value="Iraq">ඉරාකය / Iraq</option>
-          <option value="Ireland">අයර්ලන්තය / Ireland</option>
-          <option value="Israel">ඊශ්‍රායලය / Israel</option>
-          <option value="Italy">ඉතාලිය / Italy</option>
-          <option value="Jamaica">ජැමෙයිකාව / Jamaica</option>
-          <option value="Japan">ජපානය / Japan</option>
-          <option value="Jordan">ජෝර්දානය / Jordan</option>
-          <option value="Kazakhstan">කසකස්ථානය / Kazakhstan</option>
-          <option value="Kenya">කෙන්යාව / Kenya</option>
-          <option value="Kiribati">කිරිබතී / Kiribati</option>
-          <option value="Kuwait">කුවේටය / Kuwait</option>
-          <option value="Kyrgyzstan">කිර්ගිස්ථානය / Kyrgyzstan</option>
-          <option value="Laos">ලාඕසය / Laos</option>
-          <option value="Latvia">ලැට්වියාව / Latvia</option>
-          <option value="Lebanon">ලෙබනනය / Lebanon</option>
-          <option value="Lesotho">ලෙසෝතෝ / Lesotho</option>
-          <option value="Liberia">ලයිබීරියාව / Liberia</option>
-          <option value="Libya">ලිබියාව / Libya</option>
-          <option value="Liechtenstein">ලික්ටෙන්ස්ටයින් / Liechtenstein</option>
-          <option value="Lithuania">ලිතුවේනියාව / Lithuania</option>
-          <option value="Luxembourg">ලක්සම්බර්ග් / Luxembourg</option>
-          <option value="Madagascar">මැඩගස්කරය / Madagascar</option>
-          <option value="Malawi">මලාවි / Malawi</option>
-          <option value="Malaysia">මැලේසියාව / Malaysia</option>
-          <option value="Maldives">මාලදිවයින / Maldives</option>
-          <option value="Mali">මාලි / Mali</option>
-          <option value="Malta">මෝල්ටාව / Malta</option>
-          <option value="Marshall Islands">මාෂල් දූපත් / Marshall Islands</option>
-          <option value="Mauritania">මොරිටේනියාව / Mauritania</option>
-          <option value="Mauritius">මුරුසිය / Mauritius</option>
-          <option value="Mexico">මෙක්සිකෝව / Mexico</option>
-          <option value="Micronesia">මයික්‍රොනීසියාව / Micronesia</option>
-          <option value="Moldova">මෝල්ඩෝවා / Moldova</option>
-          <option value="Monaco">මොනාකෝ / Monaco</option>
-          <option value="Mongolia">මොංගෝලියාව / Mongolia</option>
-          <option value="Montenegro">මොන්ටිනිග්‍රෝ / Montenegro</option>
-          <option value="Morocco">මොරොක්කෝව / Morocco</option>
-          <option value="Mozambique">මොසැම්බික් / Mozambique</option>
-          <option value="Myanmar (formerly Burma)">මියන්මාරය / Myanmar</option>
-          <option value="Namibia">නැමීබියාව / Namibia</option>
-          <option value="Nauru">නාඌරූ / Nauru</option>
-          <option value="Nepal">නේපාලය / Nepal</option>
-          <option value="Netherlands">නෙදර්ලන්තය / Netherlands</option>
-          <option value="New Zealand">නවසීලන්තය / New Zealand</option>
-          <option value="Nicaragua">නිකරගුවාව / Nicaragua</option>
-          <option value="Niger">නයිජර් / Niger</option>
-          <option value="Nigeria">නයිජීරියාව / Nigeria</option>
-          <option value="North Korea">උතුරු කොරියාව / North Korea</option>
-          <option value="North Macedonia">උතුරු මැසිඩෝනියාව / North Macedonia</option>
-          <option value="Norway">නෝර්වේ / Norway</option>
-          <option value="Oman">ඕමානය / Oman</option>
-          <option value="Pakistan">පාකිස්ථානය / Pakistan</option>
-          <option value="Palau">පලාවු / Palau</option>
-          <option value="Palestine State">පලස්තීනය / Palestine State</option>
-          <option value="Panama">පැනමාව / Panama</option>
-          <option value="Papua New Guinea">පැපුවා නිව්ගිනියාව / Papua New Guinea</option>
-          <option value="Paraguay">පැරගුවේ / Paraguay</option>
-          <option value="Peru">පේරු / Peru</option>
-          <option value="Philippines">පිලිපීනය / Philippines</option>
-          <option value="Poland">පෝලන්තය / Poland</option>
-          <option value="Portugal">පෘතුගාලය / Portugal</option>
-          <option value="Qatar">කටාර් / Qatar</option>
-          <option value="Romania">රුමේනියාව / Romania</option>
-          <option value="Russia">රුසියාව / Russia</option>
-          <option value="Rwanda">රුවන්ඩාව / Rwanda</option>
-          <option value="Saint Kitts and Nevis">ශාන්ත කිට්ස් සහ නේවිස් / Saint Kitts and Nevis</option>
-          <option value="Saint Lucia">ශාන්ත ලුසියා / Saint Lucia</option>
-          <option value="Saint Vincent and the Grenadines">ශාන්ත වින්සන්ට් සහ ග්‍රෙනඩින්ස් / St. Vincent & Grenadines</option>
-          <option value="Samoa">සැමෝවා / Samoa</option>
-          <option value="San Marino">සැන් මරිනෝ / San Marino</option>
-          <option value="Sao Tome and Principe">සාඕ ටෝම් සහ ප්‍රින්සිපේ / Sao Tome and Principe</option>
-          <option value="Saudi Arabia">සෞදි අරාබිය / Saudi Arabia</option>
-          <option value="Senegal">සෙනගල් / Senegal</option>
-          <option value="Serbia">සර්බියාව / Serbia</option>
-          <option value="Seychelles">සීෂෙල්ස් / Seychelles</option>
-          <option value="Sierra Leone">සියෙරා ලියොන් / Sierra Leone</option>
-          <option value="Singapore">සිංගප්පූරුව / Singapore</option>
-          <option value="Slovakia">ස්ලෝවැකියාව / Slovakia</option>
-          <option value="Slovenia">ස්ලෝවේනියාව / Slovenia</option>
-          <option value="Solomon Islands">සොලමන් දූපත් / Solomon Islands</option>
-          <option value="Somalia">සෝමාලියාව / Somalia</option>
-          <option value="South Africa">දකුණු අප්‍රිකාව / South Africa</option>
-          <option value="South Korea">දකුණු කොරියාව / South Korea</option>
-          <option value="South Sudan">දකුණු සුඩානය / South Sudan</option>
-          <option value="Spain">ස්පාඤ්ඤය / Spain</option>
-          <option value="Sudan">සුඩානය / Sudan</option>
-          <option value="Suriname">සුරිනාමය / Suriname</option>
-          <option value="Sweden">ස්වීඩනය / Sweden</option>
-          <option value="Switzerland">ස්විට්සර්ලන්තය / Switzerland</option>
-          <option value="Syria">සිරියාව / Syria</option>
-          <option value="Tajikistan">තජිකිස්ථානය / Tajikistan</option>
-          <option value="Tanzania">ටැන්සානියාව / Tanzania</option>
-          <option value="Thailand">තායිලන්තය / Thailand</option>
-          <option value="Timor-Leste">ටිමෝර්-ලෙස්ටේ / Timor-Leste</option>
-          <option value="Togo">ටෝගෝ / Togo</option>
-          <option value="Tonga">ටොංගා / Tonga</option>
-          <option value="Trinidad and Tobago">ට්‍රිනිඩෑඩ් සහ ටොබැගෝ / Trinidad and Tobago</option>
-          <option value="Tunisia">ටියුනීසියාව / Tunisia</option>
-          <option value="Turkey">තුර්කිය / Turkey</option>
-          <option value="Turkmenistan">ටර්ක්මෙනිස්තානය / Turkmenistan</option>
-          <option value="Tuvalu">ටුවාලු / Tuvalu</option>
-          <option value="Uganda">උගන්ඩාව / Uganda</option>
-          <option value="Ukraine">යුක්රේනය / Ukraine</option>
-          <option value="United Arab Emirates">එක්සත් අරාබි එමීර් රාජ්‍යය / United Arab Emirates</option>
-          <option value="United Kingdom">එක්සත් රාජධානිය / United Kingdom</option>
-          <option value="United States of America">ඇමරිකා එක්සත් ජනපදය / United States</option>
-          <option value="Uruguay">උරුගුවේ / Uruguay</option>
-          <option value="Uzbekistan">උස්බෙකිස්ථානය / Uzbekistan</option>
-          <option value="Vanuatu">වනුවාටු / Vanuatu</option>
-          <option value="Venezuela">වෙනිසියුලාව / Venezuela</option>
-          <option value="Vietnam">වියට්නාමය / Vietnam</option>
-          <option value="Yemen">යේමනය / Yemen</option>
-          <option value="Zambia">සැම්බියාව / Zambia</option>
-          <option value="Zimbabwe">සිම්බාබ්වේ / Zimbabwe</option>
-        `;
-      } else {
-        optionsHtml = `
-          <option value="" disabled selected>දිස්ත්‍රික්කය තෝරන්න / Select District</option>
-          <option value="Ampara">අම්පාර / Ampara</option>
-          <option value="Anuradhapura">අනුරාධපුර / Anuradhapura</option>
-          <option value="Badulla">බදුල්ල / Badulla</option>
-          <option value="Batticaloa">මඩකලපුව / Batticaloa</option>
-          <option value="Colombo">කොළඹ / Colombo</option>
-          <option value="Galle">ගාල්ල / Galle</option>
-          <option value="Gampaha">ගම්පහ / Gampaha</option>
-          <option value="Hambantota">හම්බන්තොට / Hambantota</option>
-          <option value="Jaffna">යාපනය / Jaffna</option>
-          <option value="Kalutara">කළුතර / Kalutara</option>
-          <option value="Kandy">මහනුවර / Kandy</option>
-          <option value="Kegalle">කෑගල්ල / Kegalle</option>
-          <option value="Kilinochchi">කිලිනොච්චි / Kilinochchi</option>
-          <option value="Kurunegala">කුරුණෑගල / Kurunegala</option>
-          <option value="Mannar">මන්නාරම / Mannar</option>
-          <option value="Matale">මාතලේ / Matale</option>
-          <option value="Matara">මාතර / Matara</option>
-          <option value="Moneragala">මොණරාගල / Moneragala</option>
-          <option value="Mullaitivu">මුලතිව් / Mullaitivu</option>
-          <option value="Nuwara Eliya">නුවරඑළිය / Nuwara Eliya</option>
-          <option value="Polonnaruwa">පොළොන්නරුව / Polonnaruwa</option>
-          <option value="Puttalam">පුත්තලම / Puttalam</option>
-          <option value="Ratnapura">රත්නපුර / Ratnapura</option>
-          <option value="Trincomalee">ත්‍රිකුණාමලය / Trincomalee</option>
-          <option value="Vavuniya">වවුනියාව / Vavuniya</option>
-        `;
-      }
-
-      const optionMatches = [...optionsHtml.matchAll(/<option value="([^"]*)"(?:[^>]*)>(.*?)<\/option>/g)];
-      let customOptionsHtml = optionMatches.map(m => {
-        if (m[1] === '') return ''; // skip the disabled placeholder
-        return `<div class="custom-select-option" onclick="window.Funnel.saveText('${currentQ.field}', '${m[1]}'); document.getElementById('custom-select-modal').style.display='none'; window.Funnel.goNext();">${m[2]}</div>`;
-      }).join('');
-
-      let triggerText = 'තෝරන්න / Select...';
-      if (existing) {
-        const selectedMatch = optionMatches.find(m => m[1] === existing);
-        if (selectedMatch) triggerText = selectedMatch[2];
-      }
-
-      // Simple text version of title for the modal header
-      const headerTitle = currentQ.type === 'country-select' ? 'රට තෝරන්න / Select Country' : 'දිස්ත්‍රික්කය තෝරන්න / Select District';
-
-      const globalContainer = document.getElementById('global-select-container');
-      if (globalContainer) {
-        globalContainer.innerHTML = `
-          <div id="custom-select-modal" class="custom-select-modal" style="display:none;">
-            <div class="custom-select-dialog">
-              <div class="custom-select-header">
-                <span>${headerTitle}</span>
-                <button type="button" class="quiz-close-btn" onclick="document.getElementById('custom-select-modal').style.display='none'; event.stopPropagation();" style="position:static; margin:0; width:32px; height:32px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-              </div>
-              <div class="custom-select-body">
-                ${customOptionsHtml}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      contentArea.innerHTML = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}" style="text-align: center;">
-          <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
-            ${currentQ.title}
-          </div>
-          ${currentQ.optional ? '<p class="quiz-optional-note">අත්‍යාවශ්‍ය නොවේ &mdash; Optional</p>' : ''}
-          <div class="input-wrap" style="position:relative; margin-top: 0.5rem; text-align:left;">
-            <div id="custom-select-trigger" class="quiz-text-input custom-select-trigger" onclick="document.getElementById('custom-select-modal').style.display = 'flex';">
-              ${triggerText}
-            </div>
-          </div>
-          ${hasSelection ? `
-          <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
-            <button class="quiz-ok-btn" id="select-ok" onclick="window.Funnel.goNext()" style="${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
-          </div>
-          ` : ''}
-        </div>
-      `;
-
-      if (existing) {
-        setTimeout(() => {
-          const selectEl = contentArea.querySelector('select');
-          if (selectEl) selectEl.value = existing;
-        }, 10);
-      }
-    }
-    else if (currentQ.type === 'short-text') {
-      navBar.style.display = state.qIndex === 0 ? 'none' : 'flex';
-      const existing = state.answers[currentQ.field] || '';
-      const hasText = existing.trim().length > 0;
-
-      contentArea.innerHTML = `
-        <div class="quiz-question ${isSameQ ? 'no-anim' : ''}" style="text-align: center;">
-          <div style="margin-bottom: 1.5rem; font-family: var(--font-sans);">
-            ${currentQ.title}
-          </div>
-          <input type="${currentQ.field === 'email' ? 'email' : (currentQ.field === 'phone' ? 'tel' : 'text')}" class="quiz-text-input" id="short-text-input" style="${currentQ.field === 'phone' ? 'text-align: left;' : 'text-align: center;'}"
-            placeholder="${currentQ.field === 'phone' ? '' : (currentQ.placeholder || '')}"
-            value="${existing}"
-            maxlength="${currentQ.field === 'name' ? '60' : (currentQ.field === 'phone' ? '25' : '80')}"
-            onfocus="setTimeout(() => { this.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 300)"
-            oninput="window.Funnel.saveText('${currentQ.field}', this.value)"
-            onkeydown="if(event.key==='Enter' || event.keyCode===13) { if (${currentQ.optional} || this.value.trim().length > 0) window.Funnel.goNext(); event.preventDefault(); }">
-          <div id="short-text-error" class="cf-err" style="display:none; text-align:center; font-family:var(--font-sans); margin-top:0.5rem; font-size: 0.85rem;">
-            ${currentQ.field === 'name' ? 'කරුණාකර වලංගු නමක් ඇතුලත් කරන්න (අවම අකුරු 3ක්) <br> <span style="font-size:0.75rem;">Please enter a valid full name (min. 3 letters, no numbers)</span>' : (currentQ.field === 'email' ? 'නිවැරදි Email ලිපිනයක් යොමු කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid email address</span>' : 'කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුලත් කරන්න <br> <span style="font-size:0.75rem;">Please enter a valid mobile number</span>')}
-          </div>
-          <div style="display:flex; justify-content:center; gap:1rem; margin-top:0.75rem;">
-            ${currentQ.optional ? `<button class="btn-skip" id="short-text-skip" onclick="window.Funnel.saveText('${currentQ.field}', ''); window.Funnel.goNext()" style="${hasText ? 'display:none;' : 'display:inline-flex;'}">මඟහරින්න / Skip</button>` : ''}
-            <button class="quiz-ok-btn" id="short-text-ok" onclick="window.Funnel.goNext()" style="${hasText ? 'display:inline-flex;' : 'display:none;'}${isLastQ ? 'background:#000;color:#fff;' : ''}">${isLastQ ? 'Submit' : 'ඉදිරියට / Next'}</button>
-          </div>
-        </div>
-      `;
-
-      setTimeout(() => {
-        const inputEl = document.getElementById('short-text-input');
-
-        if (currentQ.field === 'phone' && inputEl) {
-          if (window.iti) { window.iti.destroy(); }
-
-          window.iti = window.intlTelInput(inputEl, {
-            initialCountry: "lk",
-            separateDialCode: true,
-            autoPlaceholder: "aggressive",
-            placeholderNumberType: "MOBILE",
-            nationalMode: false,
-            strictMode: true,
-            useFullscreenPopup: true,
-            dropdownContainer: document.body,
-            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/utils.js"
-          });
-
-          inputEl.addEventListener('countrychange', () => {
-            const errDiv = document.getElementById('short-text-error');
-            if (errDiv) errDiv.style.display = 'none';
-          });
-        }
-
-        if (inputEl && !isSameQ) inputEl.focus();
-      }, 50);
-    }
-  },
-
-  selectSingle: (field, value) => {
-    if (state.answers[field] !== value) {
-      window.Funnel.clearAnswersAfterCurrentIndex();
-    }
-    state.answers[field] = value;
-    setTimeout(() => window.Funnel.goNext(), 220);
-  },
-
-  toggleMulti: (value, field) => {
-    if (state.multiVals.includes(value)) {
-      state.multiVals = state.multiVals.filter(v => v !== value);
-    } else {
-      state.multiVals.push(value);
-    }
-    window.Funnel.render();
-  },
-
-  commitMulti: (field) => {
-    const currentAns = state.answers[field] || [];
-    const newAns = [...state.multiVals];
-    const isSame = currentAns.length === newAns.length && currentAns.every(v => newAns.includes(v));
-    if (!isSame) {
-      window.Funnel.clearAnswersAfterCurrentIndex();
-    }
-    state.answers[field] = newAns;
-    state.multiVals = [];
-    window.Funnel.goNext();
-  },
-
-  saveText: (field, value) => {
-    state.answers[field] = value;
-    const okBtn = document.getElementById('short-text-ok');
-    const skipBtn = document.getElementById('short-text-skip');
-    const errDiv = document.getElementById('short-text-error');
-    if (errDiv) errDiv.style.display = 'none';
-
-    if (value.trim().length > 0) {
-      if (okBtn) okBtn.style.display = 'inline-flex';
-      if (skipBtn) skipBtn.style.display = 'none';
-    } else {
-      if (okBtn) okBtn.style.display = 'none';
-      if (skipBtn) skipBtn.style.display = 'inline-flex';
-    }
-  },
-
-  goNext: () => {
-    const activeQ = window.Funnel.getActiveQuestions();
-    const currentQ = activeQ[state.qIndex];
-
-    if (currentQ && currentQ.field === 'name') {
-      const val = (state.answers['name'] || '').trim();
-      const nameRegex = /^[\p{L}\s.'\-]+$/u;
-      const isValid = val.length >= 3 && val.length <= 60 && nameRegex.test(val);
-
-      if (!isValid) {
-        const errDiv = document.getElementById('short-text-error');
-        if (errDiv) {
-          errDiv.innerHTML = 'කරුණාකර වලංගු නමක් ඇතුලත් කරන්න (අවම අකුරු 3ක්) <br> <span style="font-size:0.75rem;">Please enter a valid full name (min. 3 letters, no numbers)</span>';
-          errDiv.style.display = 'block';
-        }
-        return;
-      }
-      state.answers['name'] = val;
-    } else if (currentQ && currentQ.field === 'phone') {
-      let isValid = false;
-      if (window.iti) {
-        // 1. Google libphonenumber validation across all 240+ countries
-        isValid = window.iti.isValidNumber();
-
-        // 2. Reject landlines, toll-free, and pagers across all countries
-        if (isValid) {
-          const numberType = window.iti.getNumberType();
-          // 0 = FIXED_LINE, 3 = TOLL_FREE, 4 = PREMIUM_RATE, 8 = PAGER
-          if (numberType === 0 || numberType === 3 || numberType === 4 || numberType === 8) {
-            isValid = false;
-          }
-        }
-
-        // 3. Strict Sri Lankan mobile check (must be a valid 07X mobile series)
-        if (isValid) {
-          const countryData = window.iti.getSelectedCountryData();
-          if (countryData && countryData.iso2 === 'lk') {
-            const raw = (document.getElementById('short-text-input')?.value || state.answers['phone'] || '').replace(/[\s\-]/g, '');
-            const isLkMobile = /^(?:0|(?:\+94))?7[0-9]{8}$/.test(raw) || /^7[0-9]{8}$/.test(raw);
-            if (!isLkMobile) {
-              isValid = false;
-            }
-          }
-        }
-
-        if (isValid) {
-          state.answers['phone'] = window.iti.getNumber(); // Clean E.164 format (+9477..., +447...)
-        }
-      } else {
-        const val = (state.answers['phone'] || '').replace(/[\s\-]/g, '');
-        isValid = /^\+?\d+$/.test(val) && val.length >= 8;
-      }
-
-      if (!isValid) {
-        const errDiv = document.getElementById('short-text-error');
-        if (errDiv) errDiv.style.display = 'block';
-        return;
-      }
-    } else if (currentQ && currentQ.field === 'email') {
-      const val = (state.answers['email'] || '').trim();
-      if (val.length > 0) {
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-        if (!isEmail) {
-          const errDiv = document.getElementById('short-text-error');
-          if (errDiv) errDiv.style.display = 'block';
-          return;
-        }
-      }
-    }
-
-    if (state.qIndex < activeQ.length - 1) {
-      state.qIndex++;
-      state.multiVals = [];
-      window.Funnel.render();
-    } else {
-      state.phase = 'result';
-      window.Funnel.submitToWebhook();
-      state.multiVals = [];
-      window.Funnel.render();
-    }
-  },
-
-  goPrev: () => {
-    if (state.qIndex > 0) {
-      state.qIndex--;
-      state.multiVals = state.answers[window.Funnel.getActiveQuestions()[state.qIndex].field] || [];
-      window.Funnel.render();
-    }
-  },
-
-  clearAnswersAfterCurrentIndex: () => {
-    const activeQ = window.Funnel.getActiveQuestions();
-    const currentQ = activeQ[state.qIndex];
-    if (!currentQ) return;
-
-    const globalIdx = QUIZ_QUESTIONS.findIndex(q => q.id === currentQ.id);
-    if (globalIdx === -1) return;
-
-    for (let i = globalIdx + 1; i < QUIZ_QUESTIONS.length; i++) {
-      delete state.answers[QUIZ_QUESTIONS[i].field];
-    }
-  },
-
-  renderResult: () => {
-    const contentArea = document.getElementById('quiz-content-area');
-    document.getElementById('quiz-nav').style.display = 'none';
-
-    const firstName = (state.answers.name || 'ඔබ').split(' ')[0];
-    const groupLink = "https://chat.whatsapp.com/YOUR_GROUP_LINK_HERE";
-
-    let workshopDateStr = "Saturday | October 31 | 6:00 PM – 7:30 PM";
-    const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
-    if (new Date() > firstWorkshopDate) {
-      const d = getUpcomingWorkshopDate();
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      workshopDateStr = `Saturday | ${monthNames[d.getMonth()]} ${d.getDate()} | 6:00 PM – 7:30 PM`;
-    }
-
-    contentArea.innerHTML = `
-      <div class="quiz-result" style="display:flex; flex-direction:column; justify-content:center; min-height: 60vh;">
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align:center;">
-
-          <h2 style="line-height: 1.4; font-size: clamp(1.4rem, 4.5vw, 1.8rem); color: var(--md-sys-color-primary); font-family: var(--font-sans);">සුබ පැතුම්!</h2>
-          <h3 style="font-size: clamp(1.1rem, 3.5vw, 1.3rem); margin-top: 0.5rem; line-height: 1.5; font-family: var(--font-sans); font-weight: 600;">
-            ඔබගේ ලියාපදිංචිය සාර්ථකයි..<br>
-            <span style="font-weight:400; color:var(--ink-muted); font-size: 0.9em;">Registration Successful!</span>
-          </h3>
-
-          <div style="background: var(--md-sys-color-surface-variant); padding: 1.25rem; border-radius: 12px; margin: 2rem 0; width: 100%; text-align: center;">
-            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--ink);">📅 Workshop Details</div>
-            <div style="font-size: 0.95rem; color: var(--ink-muted); font-weight: 500;">${workshopDateStr}</div>
-          </div>
-
-          <p class="quiz-result-message" style="margin-bottom: 2rem; line-height: 1.6; font-size: clamp(0.95rem, 3vw, 1.05rem); max-width: 400px; color: var(--ink);">
-            Workshop එකට අදාළ updates, reminders සහ වැදගත් තොරතුරු දැනගන්න අපගේ නිල WhatsApp Group එකට JOIN වෙන්න
-          </p>
-
-          <a href="${groupLink}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; background-color:#25D366; color:#fff; border:none; padding:1rem 2rem; border-radius:30px; text-decoration:none; font-weight:700; font-size:1.1rem; width:100%; max-width:350px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-            Join WhatsApp Group
-          </a>
-        </div>
-      </div>
-    `;
-  },
-
-  updateProgressBar: () => {
-    const phaseLabelEl = document.getElementById('quiz-phase-label');
-    const fill = document.getElementById('quiz-progress-fill');
-
-    if (state.phase === 'result') {
-      if (phaseLabelEl) phaseLabelEl.innerText = 'Complete';
-      if (fill) fill.style.width = '100%';
-      return;
-    }
-
-    const activeQ = window.Funnel.getActiveQuestions();
-    const currentQ = activeQ[state.qIndex];
-    if (!currentQ) return;
-
-    if (phaseLabelEl) phaseLabelEl.innerHTML = `Step ${state.qIndex + 1}`;
-
-
-    let percent = Math.round(((state.qIndex) / (activeQ.length)) * 100);
-    if (percent < 5) percent = 5;
-
-    if (fill) fill.style.width = `${percent}%`;
-  },
-
-  submitToWebhook: async () => {
-    if (!WEBHOOK_URL || WEBHOOK_URL === "") return;
-
-    // Mapping for readable Google Sheet data
-    const sitMap = {
-      'learning': 'I am learning tailoring',
-      'job': 'I do tailoring as a job or service',
-      'tailoring-biz': 'I run a tailoring or clothing-related business',
-      'other-biz': 'I run another small business',
-      'planning': 'I am planning to start a business',
-      'other': 'Other / not sure yet'
-    };
-
-    const goalMap = {
-      'improve-skills': 'Improve my tailoring skills',
-      'advanced-techniques': 'Learn advanced tailoring techniques',
-      'start-earning': 'Start earning through tailoring',
-      'grow-tailoring-biz': 'Grow my existing tailoring or clothing business',
-      'grow-business-online': 'Learn how to grow a business online using the necessary digital tools and systems.'
-    };
-
-    const skillMap = {
-      'beginner': 'Beginner / just starting',
-      'basic': 'I have basic knowledge and want to learn more',
-      'intermediate': 'I can do basic tailoring but want to improve',
-      'regular': 'I regularly do tailoring',
-      'professional': 'I work professionally in tailoring',
-      'experienced': 'I’m experienced and want to learn advanced skills'
-    };
-
-    const readableSit = sitMap[state.answers.currentSituation] || state.answers.currentSituation;
-    const readableSkill = skillMap[state.answers.tailoringSkill] || state.answers.tailoringSkill;
-    const rawGoals = state.answers.primaryGoal || [];
-    const readableGoals = rawGoals.map(g => goalMap[g] || g).join(', ');
-
-    const payload = {
-      name: state.answers.name,
-      phone: state.answers.phone,
-      email: state.answers.email,
-      country: state.answers.country,
-      district: state.answers.district,
-      currentSituation: readableSit,
-      primaryGoal: readableGoals,
-      tailoringSkill: readableSkill
-    };
-    try {
-      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-      console.log("Submitted to Webhook:", payload);
-    } catch (err) {
-      console.error("Webhook error:", err);
-    }
-  }
-};
-
-function getUpcomingWorkshopDate() {
-  const now = new Date();
-  const octWorkshop = new Date(2026, 9, 31, 23, 59, 59); // Oct 31, 2026 cutoff
-  if (now <= octWorkshop) {
-    return new Date(2026, 9, 31);
-  }
-  // After Oct 31, 2026: calculate the 3rd Saturday of the upcoming month
-  let nextMonth = now.getMonth() + 1;
-  let year = now.getFullYear();
-  if (nextMonth > 11) { nextMonth = 0; year++; }
-  let d = new Date(year, nextMonth, 1);
-  while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
-  d.setDate(d.getDate() + 14);
-  return d;
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  const firstWorkshopDate = new Date(2026, 8, 20); // Sept 20, 2026 cutoff
-  if (new Date() > firstWorkshopDate) {
-    const d = getUpcomingWorkshopDate();
-
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-    const monthStr = monthNames[d.getMonth()];
-    const dayStr = d.getDate();
-
-    const alertBox = document.getElementById('post-workshop-alert');
-    if (alertBox) {
-      alertBox.style.display = 'block';
-      const alertText = document.getElementById('post-workshop-alert-text');
-      if (alertText) {
-        alertText.innerHTML = `Join our next live online workshop on <strong style="color: var(--md-sys-color-primary, #E87A76); font-weight: 700;">Saturday, ${monthNamesFull[d.getMonth()]} ${dayStr}</strong>. Reserve your free spot today!`;
-      }
-    }
-
-    ['home-event-month', 'modal-event-month'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerText = monthStr;
     });
-    ['home-event-day', 'modal-event-day'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerText = dayStr;
+    on('flow-back','click',()=>{
+      if (state.pending) return; state.error='';
+      if (state.screen==='enquiry') state.screen='custom';
+      else if (state.screen==='custom') { state.screen='question'; state.step=0; }
+      else if (state.step>0) { state.step--; if(state.step===0 && state.answers.Q1==='CUSTOM') state.screen='custom'; }
+      else state.screen='details'; render();
     });
+    on('flow-attend','click',()=>save(async()=>{ state.custom_attending=true; await request('answer',{answers:{...state.answers},custom_attending:true}); state.screen='question'; state.step=1; }));
+    on('flow-enquiry-only','click',()=>{ state.custom_attending=false; state.screen='enquiry'; render(); });
+    on('flow-enquiry','input',()=>state.enquiry_text=$('flow-enquiry').value);
+    on('flow-enquiry_consent','change',()=>state.enquiry_consent=$('flow-enquiry_consent').checked);
+    on('flow-send-enquiry','click',()=>{
+      if (state.enquiry_text.trim().length<3 || !state.enquiry_consent) { state.error='කරුණාකර ඔබේ විමසීම සඳහන් කර එයට පිළිතුරු ලබාදීම සඳහා එකඟතාව තහවුරු කරන්න.'; render(); return; }
+      save(async()=>{ const response=await request('enquiry',{answers:{Q1:'CUSTOM'},custom_attending:false,enquiry_consent:true,enquiry_text:state.enquiry_text.trim()}); if(response.status!=='enquiry_only') throw new Error('INVALID_ENQUIRY_ACK'); state.screen='enquiry_done'; analytics('enquiry_saved'); });
+    });
+    for (const key of ['ebook','mentorship','none']) on(`flow-${key}`,'change',()=>{
+      state.preferenceSaved = false; if ($('flow-pref-status')) $('flow-pref-status').textContent = '';
+      if (key==='none') state.requests=$('flow-none').checked?['none']:[];
+      else { state.requests=state.requests.filter(x=>x!=='none' && x!==key); if($(`flow-${key}`).checked) state.requests.push(key); }
+      for (const value of ['ebook','mentorship','none']) $(`flow-${value}`).checked=state.requests.includes(value);
+    });
+    on('flow-preferences','click',()=>save(async()=>{ if(!state.requests.length) state.requests=['none']; await request('preferences',{requests:[...state.requests],explicit_product_request:[...state.requests]}); state.preferenceSaved=true; }));
+    if(state.preferenceSaved && $('flow-pref-status')) $('flow-pref-status').textContent='ඔබේ කැමැත්ත සුරැකී ඇත.';
+    on('flow-membership','click',()=>save(async()=>{ await request('membership',{membership_state:'self_reported'}); state.membership='self_reported'; }));
+    on('flow-community','click',()=>{
+      if (!community()) return;
+      // The invitation opens immediately; logging cannot block workshop access.
+      request('invitation_click').then(()=>analytics('whatsapp_invitation_click')).catch(()=>{});
+    });
+    $('quiz-content-area').querySelectorAll('[data-resource]').forEach(button=>button.addEventListener('click',()=>{
+      const status=$(`${button.dataset.resource}-status`); if(status) status.textContent='පසුව එක් කෙරේ';
+    }));
+    $('flow-transcript')?.querySelector('summary')?.addEventListener('click',()=>{ if(!$('flow-transcript').open) analytics('video_skip',{video_id:state.video,method:'read_text'}); });
+    const video=$('flow-video');
+    if(video) { video.addEventListener('error',()=>{$('flow-video-error').hidden=false;}); video.querySelector('source')?.addEventListener('error',()=>{$('flow-video-error').hidden=false;}); video.addEventListener('play',()=>analytics('video_start',{video_id:state.video})); video.addEventListener('ended',()=>analytics('video_complete',{video_id:state.video})); }
   }
-
-  setTimeout(() => {
-    window.Funnel.openQuiz();
-  }, 1000);
-});
+  function openQuiz() {
+    if(opened) return; opened=true; returnFocus=document.activeElement; oldOverflow=document.body.style.overflow;
+    document.body.style.overflow='hidden'; $('quiz-overlay').style.display='flex';
+    const shell=$('quiz-overlay').querySelector('.quiz-shell-wide'); shell.setAttribute('role','dialog'); shell.setAttribute('aria-modal','true'); shell.setAttribute('aria-label','නොමිලේ වැඩමුළුව සඳහා ලියාපදිංචිය');
+    analytics('registration_start'); render();
+  }
+  function closeQuiz() {
+    if(state.screen==='details') captureDetails();
+    opened=false; $('quiz-overlay').style.display='none'; document.body.style.overflow=oldOverflow || ''; $('flow-video')?.pause(); returnFocus?.focus();
+  }
+  document.addEventListener('keydown',event=>{
+    if(!opened) return;
+    if(event.key==='Escape') { event.preventDefault(); closeQuiz(); }
+    if(event.key==='Tab') {
+      const nodes=[...$('quiz-overlay').querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href],summary,[tabindex="0"]')].filter(el=>el.getClientRects().length);
+      const first=nodes[0],last=nodes[nodes.length-1];
+      if(event.shiftKey && (document.activeElement===first || !nodes.includes(document.activeElement))) {event.preventDefault();last?.focus();}
+      else if(!event.shiftKey && document.activeElement===last) {event.preventDefault();first?.focus();}
+    }
+  });
+  window.WorkshopFlow = { selectVideo, questions: questions.map(q=>({id:q.id,codes:Object.keys(q.choices)})), open:openQuiz, close:closeQuiz, ...(preview ? { getState:()=>JSON.parse(JSON.stringify(state)), setTransport:fn=>{window.WORKSHOP_TRANSPORT=fn;} } : {}) };
+  window.Funnel = { openQuiz, closeQuiz, goPrev:()=>$('flow-back')?.click(), goNext:()=>$('flow-next')?.click() };
+  function dates() {
+    const date=new Date(`${event.date || '2026-11-14'}T12:00:00+05:30`);
+    const month=new Intl.DateTimeFormat('si-LK',{month:'long',timeZone:'Asia/Colombo'}).format(date);
+    for(const prefix of ['home','modal']) { if($(`${prefix}-event-month`)) $(`${prefix}-event-month`).textContent=month; if($(`${prefix}-event-day`)) $(`${prefix}-event-day`).textContent=String(date.getUTCDate()); if($(`${prefix}-event-time`)) $(`${prefix}-event-time`).textContent=timeText(); }
+    const days=['ඉරිදා','සඳුදා','අඟහරුවාදා','බදාදා','බ්‍රහස්පතින්දා','සිකුරාදා','සෙනසුරාදා'], short=['ඉරි','සඳු','අඟ','බදා','බ්‍රහ','සිකු','සෙන'];
+    if($('home-event-year')) $('home-event-year').textContent=String(date.getUTCFullYear());
+    if($('home-event-weekday')) $('home-event-weekday').textContent=days[date.getUTCDay()];
+    const week=document.querySelector('.date-week'), monday=new Date(date); monday.setUTCDate(date.getUTCDate()-(date.getUTCDay()+6)%7);
+    if(week) week.innerHTML=Array.from({length:7},(_,i)=>{ const d=new Date(monday); d.setUTCDate(monday.getUTCDate()+i); return `<li${i===(date.getUTCDay()+6)%7?' class="is-event"':''}><span>${short[d.getUTCDay()]}</span>${d.getUTCDate()}</li>`; }).join('');
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',dates); else dates();
+  // Legacy headline font: show the converted string only once the font is available.
+  const legacy=document.querySelectorAll('[data-legacy]');
+  if(legacy.length && document.fonts) document.fonts.load('1em "Tharu Digital Mahee"').then(faces=>{ if(!faces.length) return; legacy.forEach(el=>{ const text=el.innerHTML; el.innerHTML=`<span class="sr-only">${text}</span><span class="legacy-si" aria-hidden="true"></span>`; el.lastChild.textContent=el.dataset.legacy; el.classList.add('has-legacy'); }); }).catch(()=>{});
+})();
