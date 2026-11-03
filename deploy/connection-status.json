@@ -1,0 +1,54 @@
+{
+  "google_owner": "hansakamadhuwantha163@gmail.com",
+  "google_sheet_url": "https://docs.google.com/spreadsheets/d/1E239j1uuEqhdsXLRo7lfOIbKonVXFawxhlUh7xbv1tk/edit?gid=1011779433#gid=1011779433",
+  "spreadsheet_id": "1E239j1uuEqhdsXLRo7lfOIbKonVXFawxhlUh7xbv1tk",
+  "drive_folder_url": "https://drive.google.com/drive/u/2/folders/1rZcobJds-UrdHdtQuoK1VDSY_UgVTssK",
+  "sheet_created": true,
+  "backend_local_tests": "passed; mocked Google Sheets only",
+  "apps_script_deployed": true,
+  "hostinger_deployed": true,
+  "frontend_mode": "production",
+  "hostinger_shared_access": "theuvavec@gmail.com \u2014 Manage Services \u2014 Active; target site not yet selected",
+  "source_workbook_unchanged": true,
+  "hostinger_target": "freeworkshop.sucollection.shop",
+  "live_upload_zip": "deploy/workshop-LIVE-upload.zip (mode=production, testFlag=false)",
+  "private_config_template": "deploy/config.php.FILL-ME",
+  "next": "user follows deploy/GO-LIVE-STEPS.md (secret, Apps Script deploy, Hostinger upload, one test row)",
+  "updated_by": "Claude 2026-10-31",
+  "apps_script_project": "https://script.google.com/home/projects/15kqSkxprF2YKIbjpcXmGTcAHMJqwGBR62aA5YFOfMZSX7wJUlix0pnxy/edit (standalone, openById SHEET_ID)",
+  "apps_script_exec_url": "https://script.google.com/macros/s/AKfycbxUmm8gvTOh6DRc46hgnxf1gR2DBMkCPXV_ZzfSwa84KmueSVjkeHefXqZnnLNlVzYE/exec",
+  "apps_script_note": "setupWorkshopSheets: header check OK; formatting skipped because Registrations is a typed Sheets table (error: cannot set number format in typed column) \u2014 harmless",
+  "script_properties": "SHEET_ID + SHARED_SECRET set (secret entered by user)",
+  "live_url": "https://freeworkshop.sucollection.shop",
+  "private_config": "workshop-private/config.php next to public_html (user created, secret entered by user)",
+  "old_site_backup": "public_html/old-site",
+  "end_to_end_test": "PASS 2026-10-31: TEST row created (STARTED) -> 4 answers -> COMPLETE in Registrations sheet; test row deleted afterwards",
+  "warning": "Hostinger plan (theuvavec) expires 2026-11-04, workshop 2026-11-14 \u2014 renew",
+  "codex_pending_update": {
+    "keyboard_fix": "deploy/keyboard-fix/keyboard-fix.zip \u2014 prepared; NOT uploaded",
+    "resume_v6": "deploy/update-v6 \u2014 prepared; NOT deployed; replaces unsafe name/phone matching with browser token resume",
+    "local_preview": "http://127.0.0.1:8081/",
+    "checks": "keyboard viewport regression and independent source review passed; physical keyboard unverified",
+    "apps_script_browser_blocker": "Existing project redirects to Google Page not found in current Brave account session"
+  },
+  "mobile_ui_hotfix": {
+    "package": "deploy/mobile-ui-fix/mobile-ui-fix.zip",
+    "deployed": false,
+    "changes": "responsive hero spacing, two-line time clearance, vector arrows; keyboard and manual popup retained",
+    "blocker": "CUA server timeout in native upload file picker"
+  },
+  "latest_prepared_update": {
+    "package": "deploy/update-v9/ (5 files + workshop-update-v9.zip)",
+    "based_on": "update-v8",
+    "deployed": false,
+    "upload_owner": "user",
+    "includes": "name+WhatsApp on one screen; mobile partner logos moved under CTA (no date overlap); contact fields fit small phones",
+    "backend_changes_required": false,
+    "prepared_by": "Claude 2026-10-31"
+  },
+  "resume_backend": {
+    "status": "code ready in apps-script.js + tests/resume.test.cjs PASS",
+    "deployed": false,
+    "note": "Apps Script needs new version deployed (same deployment URL). Frontend resume logic already in app.js and degrades gracefully without it."
+  }
+}

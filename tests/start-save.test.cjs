@@ -1,0 +1,22 @@
+const {readFileSync}=require('node:fs');
+const vm=require('node:vm'), assert=require('node:assert/strict');
+const source=readFileSync(require('node:path').join(__dirname,'../app.js'),'utf8');
+const code=source.slice(source.indexOf('  function startSave(details) {'),source.indexOf('  function bind() {'));
+const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b});return {promise,resolve,reject};};
+const state={saved:true,screen:'intro'}, calls=[], note={};
+const ctx={state,Promise,Date,JSON,questions:[{id:'Q1',choices:{START:'a'}},{id:'Q2',choices:{SKILL:'b'}}],preview:true,contactFingerprint:async()=>'',readResume:()=>null,request:async(action,payload)=>{const d=deferred();calls.push({payload,...d});return d.promise;},analytics:()=>{},$:()=>note};
+vm.createContext(ctx);vm.runInContext(code,ctx);
+const tick=()=>new Promise(setImmediate);
+(async()=>{
+ const first=ctx.startSave({name:'Original'});
+ assert.equal(state.saved,false,'a pending edit must block questions');
+ await tick();assert.equal(calls.length,1);
+ const second=ctx.startSave({name:'Edited'});await tick();assert.equal(calls.length,1,'details writes must be serialized');
+ calls[0].resolve({registration_id:'row1',session_token:'token1',status:'started',resumed:true,answers:{Q1:'START'}});
+ await first;await tick();assert.equal(state.saved,false,'an older acknowledgement cannot mark the latest edit saved');
+ assert.equal(calls[1].payload.registration_id,'row1','new edit reuses the acknowledged row');
+ calls[1].reject(new Error('offline'));await assert.rejects(second,/offline/);assert.equal(state.saved,false);assert.equal(state.startFailed,true);
+ const retry=ctx.startSave({name:'Edited'});await tick();calls[2].resolve({registration_id:'row1',session_token:'token1',status:'started',resumed:true,answers:{Q1:'START',Q2:'BAD'},custom_attend_workshop:''});await retry;
+ assert.equal(state.saved,true);assert.equal(state.resumeStep,1);assert.equal(state.answers.Q1,'START');assert.equal(state.answers.Q2,undefined);
+ console.log('PASS: serialized contact edits, stale-save gating, failed-save retry and validated resume position.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

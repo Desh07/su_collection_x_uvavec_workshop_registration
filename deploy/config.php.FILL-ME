@@ -1,0 +1,7 @@
+<?php
+// Upload as  workshop-private/config.php  (NEXT TO public_html, NOT inside it).
+return [
+    'apps_script_url' => 'https://script.google.com/macros/s/AKfycbxUmm8gvTOh6DRc46hgnxf1gR2DBMkCPXV_ZzfSwa84KmueSVjkeHefXqZnnLNlVzYE/exec',
+    'shared_secret'   => 'PASTE_THE_SAME_SECRET_AS_APPS_SCRIPT_HERE',
+    'allowed_origins' => ['https://freeworkshop.sucollection.shop'],
+];
