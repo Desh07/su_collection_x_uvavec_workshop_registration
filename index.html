@@ -15,10 +15,15 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/css/intlTelInput.css">
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/intlTelInput.min.js"></script>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 </head>
 
 <body>
+
+  <div class="sticky-cta" id="sticky-cta" aria-hidden="true">
+    <span class="sticky-cta-date"><b>නොවැම්බර් 14</b> · නොමිලේ මාර්ගගත වැඩමුළුව</span>
+    <button type="button" class="sticky-cta-btn" tabindex="-1" onclick="window.Funnel.openQuiz()">නොමිලේ ස්ථානය වෙන් කරගන්න <span aria-hidden="true">↗</span></button>
+  </div>
 
   <div class="page-wrapper" id="home">
     <div class="workshop-stage">
@@ -31,15 +36,9 @@
             <button class="header-register" onclick="window.Funnel.openQuiz()">ලියාපදිංචි වන්න <span class="header-arrow" aria-hidden="true">↗</span></button>
             <button type="button" class="language-toggle" data-language-toggle aria-label="Switch language to English">English</button>
           </header>
-          <div class="hero-steps">
-            <span class="steps-count">01 <small>/ 05</small></span>
-            <ol class="steps-track" aria-hidden="true"><li class="is-current"></li><li></li><li></li><li></li><li></li></ol>
-            <p class="hero-note">ඔබේ මූලික තොරතුරු ඇතුළත් කර, ඔබ ඉගෙනගැනීමට කැමති දේ හඳුනාගැනීමට කෙටි ප්‍රශ්න හතරකට පිළිතුරු දෙන්න. වීඩියෝ නැරඹීම අනිවාර්ය නැත.</p>
-          </div>
           <div class="hero-copy">
-            <div class="campaign-eyebrow">2026 නොවැම්බර් 14 | නොමිලේ මාර්ගගත වැඩමුළුව</div>
             <h1 id="hero-title" data-legacy="m%dfhda.sl ie,eiaula iuÕ Tfí ueyqï jHdmdrh wrUkak&#x27;">ප්‍රායෝගික සැලැස්මක් සමඟ ඔබේ මැහුම් ව්‍යාපාරය අරඹන්න.</h1>
-            <p class="hero-sinhala">දැනට තිබෙන සම්පත් භාවිත කිරීම, සුදුසු නිෂ්පාදන තෝරාගැනීම, රෙදි නාස්තිය අවම කිරීම, විකුණුම් මිල සැලසුම් කිරීම සහ පාරිභෝගික විශ්වාසය ගොඩනඟාගැනීම ගැන ඉගෙනගන්න ස්වර්ණා මහත්මියගේ නොමිලේ පැවැත්වෙන මාර්ගගත වැඩමුළුවට එක්වන්න.</p>
+            <p class="hero-sinhala">ස්වර්ණා මහත්මිය සමඟ නොමිලේ මාර්ගගත වැඩමුළුව.</p>
             <div class="hero-actions">
               <button class="hero-register" onclick="window.Funnel.openQuiz()">නොමිලේ ලියාපදිංචි වන්න <span class="cta-arrow" aria-hidden="true">↗</span></button>
               <a class="explore-link" href="#learn">වැඩමුළුව ගැන දැනගන්න <span aria-hidden="true">↓</span></a>
@@ -53,12 +52,13 @@
             <ol class="date-week" aria-hidden="true">
               <li><span>සඳු</span>9</li><li><span>අඟ</span>10</li><li><span>බදා</span>11</li><li><span>බ්‍රහ</span>12</li><li><span>සිකු</span>13</li><li class="is-event"><span>සෙන</span>14</li><li><span>ඉරි</span>15</li>
             </ol>
+            <button type="button" class="fold-register" onclick="window.Funnel.openQuiz()">නොමිලේ ලියාපදිංචි වන්න <span class="cta-arrow" aria-hidden="true">↗</span></button>
             <div class="date-main">
               <strong class="date-day" id="home-event-day">14</strong>
               <div class="date-month"><span id="home-event-month">නොවැම්බර්</span><b id="home-event-year">2026</b> · <b id="home-event-weekday">සෙනසුරාදා</b></div>
             </div>
             <span class="date-rule" aria-hidden="true"></span>
-            <span id="home-event-time">වේලාව WhatsApp ප්‍රජාවේ ඡන්ද විමසීමෙන් පසු තහවුරු කෙරේ. ඔබට පහසු වේලාව සඳහා ඡන්දය දීමට ලියාපදිංචි වී ප්‍රජාවට එක්වන්න.</span>
+            <span id="home-event-time">වේලාව WhatsApp ප්‍රජාවේ ඡන්දයෙන් තීරණය වේ.</span>
           </aside>
           <div class="partner-logos" aria-label="සංවිධායකයින්">
             <div class="partner-logo"><img src="logo-su-transparent.png" alt="Su Collection"></div>
@@ -70,20 +70,38 @@
               <a class="mentor-more" href="#learn">වැඩි විස්තර</a>
             </article>
           </div>
-          <div class="scene-footer"><span><i class="scene-line" aria-hidden="true"></i>Su Collection × UVA VEC</span></div>
         </section>
       </main>
     </div>
-    <section class="learn-section" id="learn" aria-labelledby="learn-title">
-      <div class="learn-heading"><h2 id="learn-title" data-legacy="jevuq¿fõ ud;Dld my">වැඩමුළුවේ මාතෘකා පහ</h2><p class="learn-intro">කුඩා මැහුම් ව්‍යාපාරයක් ආරම්භ කිරීමට සැලසුම් කරන ඔබටත්, දැනට මැහුම් ඇණවුම් භාරගෙන තම වැඩ කටයුතු දියුණු කරගැනීමට කැමති ඔබටත්.</p></div>
-      <div class="learning-points">
-        <article><span>01</span><h3 data-legacy="wvq uqo,lska Tfí ueyqï jHdmdrh wrUkafka fldfyduo@">අඩු මුදලකින් ඔබේ මැහුම් ව්‍යාපාරය අරඹන්නේ කොහොමද?</h3><p>දැනට තිබෙන දක්ෂතා, උපකරණ සහ සම්පත් භාවිතයෙන් ව්‍යාපාරයක් ආරම්භ කිරීම සහ මුලින්ම අවශ්‍ය දේ තෝරාගැනීම.</p></article>
-        <article><span>02</span><h3 data-legacy="wvq úhoulska wdrïN l&lt; yels&quot; mdßfNda.sl b,a¨ug .e,fmk ksIamdok f;dard.kafka fldfyduo@">අඩු වියදමකින් ආරම්භ කළ හැකි, පාරිභෝගික ඉල්ලුමට ගැලපෙන නිෂ්පාදන තෝරාගන්නේ කොහොමද?</h3><p>පාරිභෝගික අවශ්‍යතා හඳුනාගෙන, ආරම්භයට සුදුසු ඇඳුම්, මැහුම් නිෂ්පාදන සහ කුඩා ඇණවුම් තෝරාගැනීම.</p></article>
-        <article><span>03</span><h3 data-legacy="frÈ kdia;sh wju lrñka ;sfnk frÈj,ska Wmßu m%fhdack .kafka fldfyduo@">රෙදි නාස්තිය අවම කරමින් තිබෙන රෙදිවලින් උපරිම ප්‍රයෝජන ගන්නේ කොහොමද?</h3><p>රෙදි නාස්තිය අවම කිරීම, ඉතිරි රෙදි නැවත භාවිත කිරීම සහ අමුද්‍රව්‍ය මිලදී ගැනීමේදී වියදම් පාලනය කිරීම.</p></article>
-        <article><span>04</span><h3 data-legacy="úhoï wdjrKh lr ,dNhla b,lal lrk úl=Kqï ñ,la ;SrKh lrkafka fldfyduo@">වියදම් ආවරණය කර ලාභයක් ඉලක්ක කරන විකුණුම් මිලක් තීරණය කරන්නේ කොහොමද?</h3><p>රෙදි, අමුද්‍රව්‍ය, ශ්‍රමය, විදුලිය සහ අනෙකුත් වියදම් ගණනය කර සාධාරණ විකුණුම් මිලක් තීරණය කිරීම සහ මුදල් නිවැරදිව කළමනාකරණය කිරීම.</p></article>
-        <article><span>05</span><h3 data-legacy="m&lt;uq weKjqfuka kej; kej; weKjqï olajd hkafka fldfyduo@">පළමු ඇණවුමෙන් නැවත නැවත ඇණවුම් දක්වා යන්නේ කොහොමද?</h3><p>ගුණාත්මකභාවය රැකගැනීම, නියමිත වේලාවට ඇණවුම් භාරදීම සහ හොඳ පාරිභෝගික සේවාවක් තුළින් විශ්වාසය ගොඩනඟා ව්‍යාපාරය වර්ධනය කිරීම.</p></article>
-        <p class="workshop-scope">මෙම වැඩමුළුවේ අවධානය යොමුවන්නේ මැහුම් ව්‍යාපාරයක ප්‍රායෝගික තීරණ පිළිබඳවයි. සහභාගී වීමට කිසිදු භාණ්ඩයක් හෝ වැඩසටහනක් මිලදී ගැනීම අවශ්‍ය නොවේ.</p>
+    <div class="trust-strip" aria-label="වැඩමුළු තොරතුරු">
+      <div class="trust-track">
+        <span>100% නොමිලේ</span><span>මාර්ගගත වැඩමුළුව</span><span>2026 නොවැම්බර් 14</span><span>කෙටි ප්‍රශ්න 4ක් පමණයි</span><span>කිසිවක් මිලදී ගැනීම අවශ්‍ය නැත</span><span>Su Collection × UVA VEC</span>
+        <span aria-hidden="true">100% නොමිලේ</span><span aria-hidden="true">මාර්ගගත වැඩමුළුව</span><span aria-hidden="true">2026 නොවැම්බර් 14</span><span aria-hidden="true">කෙටි ප්‍රශ්න 4ක් පමණයි</span><span aria-hidden="true">කිසිවක් මිලදී ගැනීම අවශ්‍ය නැත</span><span aria-hidden="true">Su Collection × UVA VEC</span>
       </div>
+    </div>
+    <section class="learn-section" id="learn" aria-labelledby="learn-title">
+      <div class="learn-heading"><h2 id="learn-title" data-legacy="jevuq¿fõ ud;Dld my">වැඩමුළුවේ මාතෘකා පහ</h2></div>
+      <div class="learning-points">
+        <article><span>01</span><h3>අඩු මුදලකින් ඔබේ මැහුම් ව්‍යාපාරය අරඹන්නේ කොහොමද?</h3></article>
+        <article><span>02</span><h3>අඩු වියදමකින් ආරම්භ කළ හැකි, පාරිභෝගික ඉල්ලුමට ගැලපෙන නිෂ්පාදන තෝරාගන්නේ කොහොමද?</h3></article>
+        <article><span>03</span><h3>රෙදි නාස්තිය අවම කරමින් තිබෙන රෙදිවලින් උපරිම ප්‍රයෝජන ගන්නේ කොහොමද?</h3></article>
+        <article><span>04</span><h3>වියදම් ආවරණය කර ලාභයක් ඉලක්ක කරන විකුණුම් මිලක් තීරණය කරන්නේ කොහොමද?</h3></article>
+        <article><span>05</span><h3>පළමු ඇණවුමෙන් නැවත නැවත ඇණවුම් දක්වා යන්නේ කොහොමද?</h3></article>
+      </div>
+      <div class="section-cta"><button class="hero-register" onclick="window.Funnel.openQuiz()">නොමිලේ ස්ථානය වෙන් කරගන්න <span class="cta-arrow" aria-hidden="true">↗</span></button></div>
+    </section>
+    <section class="steps-section" aria-labelledby="steps-title">
+      <h2 id="steps-title">ලියාපදිංචි වන්නේ කොහොමද?</h2>
+      <ol class="how-steps">
+        <li><span class="how-num">1</span><div><h3>ඔබේ නම සහ WhatsApp අංකය</h3></div></li>
+        <li><span class="how-num">2</span><div><h3>කෙටි ප්‍රශ්න 4ක්</h3></div></li>
+        <li><span class="how-num">3</span><div><h3>ඔබට ගැළපෙන කෙටි වීඩියෝවක්</h3></div></li>
+      </ol>
+    </section>
+    <section class="final-cta" aria-labelledby="final-cta-title">
+      <span class="final-cta-date">2026 නොවැම්බර් 14 · සෙනසුරාදා</span>
+      <h2 id="final-cta-title">ඔබේ නොමිලේ ස්ථානය දැන්ම වෙන් කරගන්න</h2>
+      <button class="hero-register" onclick="window.Funnel.openQuiz()">නොමිලේ ලියාපදිංචි වන්න <span class="cta-arrow" aria-hidden="true">↗</span></button>
     </section>
     <footer class="site-footer"><span>Su Collection × UVA VEC</span></footer>
   </div>
@@ -111,9 +129,10 @@
   </div>
 
   <div id="global-select-container"></div>
-  <script src="config.js"></script>
-  <script src="translations.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=13"></script>
+  <script src="translations.js?v=13"></script>
+  <script src="app.js?v=13"></script>
+  <script src="extras.js?v=13"></script>
 </body>
 
 </html>

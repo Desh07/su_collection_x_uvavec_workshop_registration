@@ -1,0 +1,11 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync(require('node:path').join(__dirname,'../app.js'),'utf8');
+const code=source.slice(source.indexOf('  function showIntro(details) {'),source.indexOf('  function bind() {'));
+const frames=[],events=[],state={screen:'details',saved:true};
+const ctx={state,document:{activeElement:{blur:()=>events.push('keyboard-dismiss')}},window:{requestAnimationFrame:f=>frames.push(f)},render:()=>events.push('intro-render'),startSave:details=>{events.push('background-save');assert.equal(details.name,'Test');return new Promise(()=>{});}};
+vm.createContext(ctx);vm.runInContext(code,ctx);ctx.showIntro({name:'Test'});ctx.showIntro({name:'duplicate'});
+assert.equal(state.screen,'intro');assert.equal(state.saved,false);assert.equal(frames.length,1,'double submission schedules only one handoff');
+frames.shift()();assert.deepEqual(events,['keyboard-dismiss','intro-render'],'render does not wait for network');assert.equal(state.enteringIntro,true);
+frames.shift()();assert.deepEqual(events,['keyboard-dismiss','intro-render','background-save']);assert.equal(state.enteringIntro,false,'navigation unblocks after save starts');
+assert(source.includes("if (config.resumeEnabled !== true || !window.crypto?.subtle) return '';"),'pending resume feature stays off unless explicitly configured');
+console.log('PASS: email-to-intro paints before delayed save, dismisses keyboard and prevents duplicate handoffs.');

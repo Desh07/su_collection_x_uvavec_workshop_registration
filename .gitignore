@@ -30,3 +30,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private workshop deployment configuration
+workshop-private/
+server/config.php
+server/*.secret
+outputs/
+
+# Generated build/upload artifacts (rebuild with tools/build-preview.py and tools/make-update.py)
+deploy/update-*/
+deploy/fix-mobile/
+deploy/keyboard-fix/
+deploy/mobile-ui-fix/
+deploy/*.zip
+deploy/*.html
+/preview-*.png

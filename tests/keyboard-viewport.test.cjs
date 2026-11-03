@@ -1,0 +1,18 @@
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+const source=fs.readFileSync(require('node:path').join(__dirname,'../extras.js'),'utf8').split('/* Fit the popup')[1];
+const events={},values={},frames=[],listeners={};
+const input={matches:()=>true,getBoundingClientRect:()=>({top:290,bottom:350})};
+const panel={scrollTop:0,contains:x=>x===input,getBoundingClientRect:()=>({top:50,bottom:320})};
+const overlay={style:{display:'flex'}};
+const viewport={height:400,offsetTop:18,addEventListener:(n,f)=>events[n]=f};
+const document={documentElement:{style:{setProperty:(k,v)=>values[k]=v}},getElementById:id=>id==='quiz-overlay'?overlay:panel,activeElement:input,addEventListener:(n,f)=>listeners[n]=f};
+const window={visualViewport:viewport,innerHeight:800,requestAnimationFrame:f=>(frames.push(f),frames.length),addEventListener:(n,f)=>listeners[n]=f};
+vm.runInNewContext('/* Fit the popup'+source,{window,document,Math});
+assert.equal(frames.length,1);events.resize();events.scroll();assert.equal(frames.length,1,'coalesce viewport events');frames.shift()();
+assert.equal(values['--quiz-viewport-height'],'400px');assert.equal(values['--quiz-viewport-top'],'18px');assert.equal(panel.scrollTop,42,'focused field scrolls above footer');
+viewport.height=800;viewport.offsetTop=0;overlay.style.display='none';events.resize();frames.shift()();
+assert.equal(values['--quiz-viewport-height'],'800px');assert.equal(values['--quiz-viewport-top'],'0px');assert.equal(panel.scrollTop,42,'hidden popup does not scroll');
+const css=fs.readFileSync(require('node:path').join(__dirname,'../styles.css'),'utf8');
+assert(!/calc\(100dvh -/.test(css),'shell limits follow visual viewport, not layout viewport');
+assert(css.includes('height: 100%; max-height: none;'),'fullpage also fits overlay height');
+console.log('PASS: keyboard viewport height/offset, focused input scrolling, resize coalescing and closed-popup behavior.');
